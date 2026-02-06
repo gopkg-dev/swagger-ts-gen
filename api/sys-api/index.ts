@@ -8,20 +8,6 @@ import type {
 } from './model';
 
 /**
- * 批量删除接口
- * @param data - 请求数据
- * @returns Promise<void>
- */
-export async function deleteApis(data: DeleteApiForm) {
-  const res = await request.delete<ApiResult<void>>('/api/v1/sys-api', { data });
-  if (res.data.success) {
-    return;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '批量删除接口失败'));
-}
-
-
-/**
  * 查询接口列表
  * @param params - 查询参数
  * @returns Promise<PageResult<Api>>
@@ -32,6 +18,20 @@ export async function queryApis(params?: ApisQueryParam) {
     return res.data.data;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '查询接口列表失败'));
+}
+
+
+/**
+ * 批量删除接口
+ * @param data - 请求数据
+ * @returns Promise<void>
+ */
+export async function deleteApis(data: DeleteApiForm) {
+  const res = await request.delete<ApiResult<void>>('/api/v1/sys-api', { data });
+  if (res.data.success) {
+    return;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '批量删除接口失败'));
 }
 
 

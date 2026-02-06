@@ -18,3 +18,4 @@
 - Added verbose logging flag (-v/--verbose) to control runtime log output in CLI.
 - Verbose logging now prints per-operation details (method/path/query/body/return).
 - CLI framework switched to cobra (professional command line package).
+- Operation extraction now uses fixed HTTP method order (GET/POST/PUT/PATCH/DELETE/HEAD/OPTIONS) to guarantee deterministic API function generation order.

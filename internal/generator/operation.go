@@ -35,6 +35,11 @@ type RawOperation struct {
 	Response    *openapi3.SchemaRef
 }
 
+type methodOperation struct {
+	Method    string
+	Operation *openapi3.Operation
+}
+
 var pathParamRegexp = regexp.MustCompile(`\{([^}]+)\}`)
 
 func ExtractOperations(doc *openapi3.T) ([]RawOperation, error) {
@@ -55,7 +60,9 @@ func ExtractOperations(doc *openapi3.T) ([]RawOperation, error) {
 		if item == nil {
 			continue
 		}
-		for method, op := range operationsForPathItem(item) {
+		for _, methodOperation := range operationsForPathItem(item) {
+			method := methodOperation.Method
+			op := methodOperation.Operation
 			if op == nil {
 				continue
 			}
@@ -93,15 +100,15 @@ func ExtractOperations(doc *openapi3.T) ([]RawOperation, error) {
 	return ops, nil
 }
 
-func operationsForPathItem(item *openapi3.PathItem) map[string]*openapi3.Operation {
-	return map[string]*openapi3.Operation{
-		"get":     item.Get,
-		"post":    item.Post,
-		"put":     item.Put,
-		"patch":   item.Patch,
-		"delete":  item.Delete,
-		"head":    item.Head,
-		"options": item.Options,
+func operationsForPathItem(item *openapi3.PathItem) []methodOperation {
+	return []methodOperation{
+		{Method: "get", Operation: item.Get},
+		{Method: "post", Operation: item.Post},
+		{Method: "put", Operation: item.Put},
+		{Method: "patch", Operation: item.Patch},
+		{Method: "delete", Operation: item.Delete},
+		{Method: "head", Operation: item.Head},
+		{Method: "options", Operation: item.Options},
 	}
 }
 

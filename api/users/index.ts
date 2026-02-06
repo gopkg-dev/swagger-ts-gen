@@ -37,6 +37,20 @@ export async function createUser(data: UserForm) {
 
 
 /**
+ * 根据ID获取用户
+ * @param id - 唯一 ID
+ * @returns Promise<User>
+ */
+export async function getUser(id: string) {
+  const res = await request.get<ApiResult<User>>(`/api/v1/users/${id}`);
+  if (res.data.success && res.data.data !== undefined) {
+    return res.data.data;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '根据ID获取用户失败'));
+}
+
+
+/**
  * 更新用户信息
  * @param id - 唯一 ID
  * @param data - 请求数据
@@ -62,20 +76,6 @@ export async function deleteUser(id: string) {
     return;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '根据ID删除用户失败'));
-}
-
-
-/**
- * 根据ID获取用户
- * @param id - 唯一 ID
- * @returns Promise<User>
- */
-export async function getUser(id: string) {
-  const res = await request.get<ApiResult<User>>(`/api/v1/users/${id}`);
-  if (res.data.success && res.data.data !== undefined) {
-    return res.data.data;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '根据ID获取用户失败'));
 }
 
 
