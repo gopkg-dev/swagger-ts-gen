@@ -132,4 +132,3 @@ api/<group>/
 - `cmd/swagger-ts`：CLI 入口
 - `internal/loader`：文档读取与版本处理
 - `internal/generator`：类型与 API 代码生成逻辑
-- `output`：生成产物目录（示例）
