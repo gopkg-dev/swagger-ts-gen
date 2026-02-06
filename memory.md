@@ -19,3 +19,8 @@
 - Verbose logging now prints per-operation details (method/path/query/body/return).
 - CLI framework switched to cobra (professional command line package).
 - Operation extraction now uses fixed HTTP method order (GET/POST/PUT/PATCH/DELETE/HEAD/OPTIONS) to guarantee deterministic API function generation order.
+- Added root README.md documenting CLI usage, generation rules, deterministic ordering, output layout, and quality check commands.
+- README now explicitly states the generator is only intended for go-fiber-admin project conventions.
+- Generator now always writes outputDir/index.ts with ApiError/ApiResult/PageParam/PageResult base interfaces for go-fiber-admin frontend conventions.
+- Module path changed to github.com/gopkg-dev/swagger-ts-gen; README installation switched to go install github.com/gopkg-dev/swagger-ts-gen/cmd/swagger-ts@latest.
+- Added a root .gitignore with Go build artifacts, editor/system files, logs/temp files, and output/ directory ignore rules.

@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Go build artifacts
+bin/
+dist/
+*.test
+*.out
+coverage.out
+
+# Runtime / temp files
+*.log
+tmp/
+
+# Generated output directory (optional output target)
+output/
+
+memory.md
+QUALITY.md
+CHECKLIST.md

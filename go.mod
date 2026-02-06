@@ -1,4 +1,4 @@
-module swagger-ts-gen
+module github.com/gopkg-dev/swagger-ts-gen
 
 go 1.25.1
 

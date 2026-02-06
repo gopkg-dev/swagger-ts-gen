@@ -8,8 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"swagger-ts-gen/internal/generator"
-	"swagger-ts-gen/internal/loader"
+	"github.com/gopkg-dev/swagger-ts-gen/internal/generator"
+	"github.com/gopkg-dev/swagger-ts-gen/internal/loader"
 )
 
 func main() {
@@ -66,7 +66,7 @@ func main() {
 	}
 
 	rootCmd.Flags().StringVarP(&input, "input", "i", "", "Swagger/OpenAPI json or yaml file path, or URL")
-	rootCmd.Flags().StringVarP(&output, "output", "o", "api", "output directory")
+	rootCmd.Flags().StringVarP(&output, "output", "o", "output", "output directory")
 	rootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose logging")
 
 	if err := rootCmd.Execute(); err != nil {

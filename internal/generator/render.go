@@ -8,6 +8,55 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
+func renderRootIndexFile() string {
+	return `/**
+ * 接口错误信息
+ */
+export interface ApiError {
+  /** HTTP 状态码 */
+  code: number;
+  /** 错误原因 */
+  reason: string;
+  /** 错误消息 */
+  message: string;
+  /** 额外数据 */
+  metadata?: Record<string, any>;
+}
+
+/**
+ * 接口统一返回结果
+ */
+export interface ApiResult<T = any> {
+  /** 是否成功 */
+  success: boolean;
+  /** 返回数据 */
+  data?: T;
+  /** 错误信息 */
+  error?: ApiError;
+}
+
+/**
+ * 分页查询参数
+ */
+export interface PageParam {
+  /** 当前页 */
+  current?: number;
+  /** 每页数量 */
+  pageSize?: number;
+}
+
+/**
+ * 分页查询结果
+ */
+export interface PageResult<T> {
+  /** 数据列表 */
+  list: T[];
+  /** 总数量 */
+  count: number;
+}
+`
+}
+
 func RenderType(def *TypeDef, registry *TypeRegistry) (string, []string) {
 	deps := map[string]struct{}{}
 

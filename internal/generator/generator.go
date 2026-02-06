@@ -56,6 +56,13 @@ func (g *Generator) Generate() (*Report, error) {
 	}
 	sort.Strings(groupNames)
 
+	if err := os.MkdirAll(g.outputDir, 0o755); err != nil {
+		return nil, fmt.Errorf("create output dir failed: %w", err)
+	}
+	if err := os.WriteFile(filepath.Join(g.outputDir, "index.ts"), []byte(renderRootIndexFile()), 0o644); err != nil {
+		return nil, fmt.Errorf("write root index failed: %w", err)
+	}
+
 	report := &Report{}
 
 	for _, groupName := range groupNames {
