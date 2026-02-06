@@ -8,6 +8,20 @@ import type {
 } from './model';
 
 /**
+ * 批量删除字典项
+ * @param data - 请求数据
+ * @returns Promise<void>
+ */
+export async function deleteDictItems(data: DeleteDictItemForm) {
+  const res = await request.delete<ApiResult<void>>('/api/v1/dict-items', { data });
+  if (res.data.success) {
+    return;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '批量删除字典项失败'));
+}
+
+
+/**
  * 查询字典项列表
  * @param params - 查询参数
  * @returns Promise<PageResult<DictItem>>
@@ -32,20 +46,6 @@ export async function createDictItem(data: DictItemForm) {
     return res.data.data;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '创建字典项失败'));
-}
-
-
-/**
- * 批量删除字典项
- * @param data - 请求数据
- * @returns Promise<void>
- */
-export async function deleteDictItems(data: DeleteDictItemForm) {
-  const res = await request.delete<ApiResult<void>>('/api/v1/dict-items', { data });
-  if (res.data.success) {
-    return;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '批量删除字典项失败'));
 }
 
 

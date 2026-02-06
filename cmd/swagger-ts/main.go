@@ -14,6 +14,7 @@ func main() {
 	var input string
 	var output string
 	var verbose bool
+	var logf func(string, ...any)
 
 	flag.StringVar(&input, "input", "", "Swagger/OpenAPI json or yaml file path, or URL")
 	flag.StringVar(&input, "i", "", "Swagger/OpenAPI json or yaml file path, or URL (shorthand)")
@@ -28,28 +29,35 @@ func main() {
 		os.Exit(2)
 	}
 
-	logger := log.New(os.Stderr, "[swagger-ts] ", log.LstdFlags)
-	logf := func(string, ...any) {}
 	if verbose {
+		logger := log.New(os.Stderr, "[swagger-ts] ", log.LstdFlags)
 		logf = logger.Printf
 	}
 
-	logf("loading spec from %s", input)
+	if logf != nil {
+		logf("loading spec from %s", input)
+	}
 	spec, meta, err := loader.Load(input)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
-	logf("spec loaded: %s", meta.Version)
+	if logf != nil {
+		logf("spec loaded: %s", meta.Version)
+	}
 
-	gen := generator.New(spec, generator.Options{OutputDir: output})
-	logf("generating output to %s", output)
+	gen := generator.New(spec, generator.Options{OutputDir: output, Logf: logf})
+	if logf != nil {
+		logf("generating output to %s", output)
+	}
 	report, err := gen.Generate()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
-	logf("generated groups=%d operations=%d types=%d", report.Groups, report.Operations, report.Types)
+	if logf != nil {
+		logf("generated groups=%d operations=%d types=%d", report.Groups, report.Operations, report.Types)
+	}
 
 	fmt.Printf("Source: %s\n", meta.Source)
 	fmt.Printf("Spec: %s\n", meta.Version)

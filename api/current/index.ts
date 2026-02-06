@@ -122,6 +122,19 @@ export async function getCurrentSocialBindings() {
 
 
 /**
+ * 获取用户信息
+ * @returns Promise<User>
+ */
+export async function getUserInfo() {
+  const res = await request.get<ApiResult<User>>('/api/v1/current/user');
+  if (res.data.success && res.data.data !== undefined) {
+    return res.data.data;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '获取用户信息失败'));
+}
+
+
+/**
  * 修改基础信息
  * @param data - 请求数据
  * @returns Promise<void>
@@ -132,18 +145,5 @@ export async function updateCurrentUser(data: UpdateCurrentUser) {
     return;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '修改基础信息失败'));
-}
-
-
-/**
- * 获取用户信息
- * @returns Promise<User>
- */
-export async function getUserInfo() {
-  const res = await request.get<ApiResult<User>>('/api/v1/current/user');
-  if (res.data.success && res.data.data !== undefined) {
-    return res.data.data;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '获取用户信息失败'));
 }
 

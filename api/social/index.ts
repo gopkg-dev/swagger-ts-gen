@@ -27,6 +27,19 @@ export async function socialLogin(data: SocialLoginForm) {
 
 
 /**
+ * 获取已启用的第三方登录平台列表（公开接口）
+ * @returns Promise<SocialProvider[]>
+ */
+export async function getEnabledSocialProviders() {
+  const res = await request.get<ApiResult<SocialProvider[]>>('/api/v1/social/providers');
+  if (res.data.success && res.data.data !== undefined) {
+    return res.data.data;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '获取已启用的第三方登录平台列表（公开接口）失败'));
+}
+
+
+/**
  * 创建第三方登录平台配置
  * @param data - 请求数据
  * @returns Promise<SocialProvider>
@@ -37,19 +50,6 @@ export async function createSocialProvider(data: SocialProviderForm) {
     return res.data.data;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '创建第三方登录平台配置失败'));
-}
-
-
-/**
- * 获取已启用的第三方登录平台列表（公开接口）
- * @returns Promise<SocialProvider[]>
- */
-export async function getEnabledSocialProviders() {
-  const res = await request.get<ApiResult<SocialProvider[]>>('/api/v1/social/providers');
-  if (res.data.success && res.data.data !== undefined) {
-    return res.data.data;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '获取已启用的第三方登录平台列表（公开接口）失败'));
 }
 
 
@@ -139,20 +139,6 @@ export async function enableSocialProvider(id: string) {
 
 
 /**
- * 获取授权链接（公开接口）
- * @param source - 平台编码（如：GitHub、TikTok）
- * @returns Promise<GetSocialAuthURLResult>
- */
-export async function getSocialAuthURL(source: string) {
-  const res = await request.get<ApiResult<GetSocialAuthURLResult>>(`/api/v1/social/${source}`);
-  if (res.data.success && res.data.data !== undefined) {
-    return res.data.data;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '获取授权链接（公开接口）失败'));
-}
-
-
-/**
  * 绑定第三方账号（需登录）
  * @param source - 平台编码（如：GitHub、TikTok）
  * @param data - 请求数据
@@ -178,5 +164,19 @@ export async function unbindSocialAccount(source: string) {
     return res.data.data;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '解绑第三方账号（需登录）失败'));
+}
+
+
+/**
+ * 获取授权链接（公开接口）
+ * @param source - 平台编码（如：GitHub、TikTok）
+ * @returns Promise<GetSocialAuthURLResult>
+ */
+export async function getSocialAuthURL(source: string) {
+  const res = await request.get<ApiResult<GetSocialAuthURLResult>>(`/api/v1/social/${source}`);
+  if (res.data.success && res.data.data !== undefined) {
+    return res.data.data;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '获取授权链接（公开接口）失败'));
 }
 

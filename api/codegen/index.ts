@@ -24,6 +24,20 @@ export async function queryGenConfigs(params?: GenConfigsQueryParam) {
 
 
 /**
+ * 获取生成配置详情
+ * @param tableName - 表名
+ * @returns Promise<GenConfig>
+ */
+export async function getGenConfig(tableName: string) {
+  const res = await request.get<ApiResult<GenConfig>>(`/api/v1/codegen/configs/${tableName}`);
+  if (res.data.success && res.data.data !== undefined) {
+    return res.data.data;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '获取生成配置详情失败'));
+}
+
+
+/**
  * 更新生成配置
  * @param tableName - 表名
  * @param data - 请求数据
@@ -35,20 +49,6 @@ export async function updateGenConfig(tableName: string, data: GenConfigUpdateFo
     return;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '更新生成配置失败'));
-}
-
-
-/**
- * 获取生成配置详情
- * @param tableName - 表名
- * @returns Promise<GenConfig>
- */
-export async function getGenConfig(tableName: string) {
-  const res = await request.get<ApiResult<GenConfig>>(`/api/v1/codegen/configs/${tableName}`);
-  if (res.data.success && res.data.data !== undefined) {
-    return res.data.data;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '获取生成配置详情失败'));
 }
 
 

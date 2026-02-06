@@ -40,20 +40,6 @@ export async function createRole(data: RoleForm) {
 
 
 /**
- * 批量移除角色下的用户
- * @param data - 请求数据
- * @returns Promise<void>
- */
-export async function deleteRoleUsers(data: RoleUsersForm) {
-  const res = await request.delete<ApiResult<void>>('/api/v1/roles/users', { data });
-  if (res.data.success) {
-    return;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '批量移除角色下的用户失败'));
-}
-
-
-/**
  * 批量添加用户到角色
  * @param data - 请求数据
  * @returns Promise<void>
@@ -68,16 +54,16 @@ export async function addRoleUsers(data: RoleUsersForm) {
 
 
 /**
- * 根据ID删除角色
- * @param id - 唯一 ID
+ * 批量移除角色下的用户
+ * @param data - 请求数据
  * @returns Promise<void>
  */
-export async function deleteRole(id: string) {
-  const res = await request.delete<ApiResult<void>>(`/api/v1/roles/${id}`);
+export async function deleteRoleUsers(data: RoleUsersForm) {
+  const res = await request.delete<ApiResult<void>>('/api/v1/roles/users', { data });
   if (res.data.success) {
     return;
   }
-  return Promise.reject(new Error(res.data.error?.message ?? '根据ID删除角色失败'));
+  return Promise.reject(new Error(res.data.error?.message ?? '批量移除角色下的用户失败'));
 }
 
 
@@ -111,17 +97,16 @@ export async function updateRole(id: string, data: RoleForm) {
 
 
 /**
- * 保存角色的数据权限
+ * 根据ID删除角色
  * @param id - 唯一 ID
- * @param data - 请求数据
  * @returns Promise<void>
  */
-export async function saveRoleDataScope(id: string, data: RoleDataScopeForm) {
-  const res = await request.put<ApiResult<void>>(`/api/v1/roles/${id}/data`, data);
+export async function deleteRole(id: string) {
+  const res = await request.delete<ApiResult<void>>(`/api/v1/roles/${id}`);
   if (res.data.success) {
     return;
   }
-  return Promise.reject(new Error(res.data.error?.message ?? '保存角色的数据权限失败'));
+  return Promise.reject(new Error(res.data.error?.message ?? '根据ID删除角色失败'));
 }
 
 
@@ -136,6 +121,21 @@ export async function getRoleDataScope(id: string) {
     return res.data.data;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '获取角色的数据权限失败'));
+}
+
+
+/**
+ * 保存角色的数据权限
+ * @param id - 唯一 ID
+ * @param data - 请求数据
+ * @returns Promise<void>
+ */
+export async function saveRoleDataScope(id: string, data: RoleDataScopeForm) {
+  const res = await request.put<ApiResult<void>>(`/api/v1/roles/${id}/data`, data);
+  if (res.data.success) {
+    return;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '保存角色的数据权限失败'));
 }
 
 

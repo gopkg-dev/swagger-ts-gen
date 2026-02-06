@@ -12,6 +12,7 @@ import (
 
 type Options struct {
 	OutputDir string
+	Logf      func(string, ...any)
 }
 
 type Report struct {
@@ -23,6 +24,7 @@ type Report struct {
 type Generator struct {
 	spec      *openapi3.T
 	outputDir string
+	logf      func(string, ...any)
 }
 
 func New(spec *openapi3.T, opts Options) *Generator {
@@ -30,7 +32,7 @@ func New(spec *openapi3.T, opts Options) *Generator {
 	if output == "" {
 		output = "api"
 	}
-	return &Generator{spec: spec, outputDir: output}
+	return &Generator{spec: spec, outputDir: output, logf: opts.Logf}
 }
 
 func (g *Generator) Generate() (*Report, error) {
@@ -191,6 +193,22 @@ func (g *Generator) buildGroupOperations(rawOps []RawOperation) ([]Operation, []
 		}
 
 		op.ErrorText = buildErrorText(op.Summary)
+
+		if g.logf != nil {
+			g.logf(
+				"operation name=%s method=%s path=%s group=%s page=%t pathParams=%s query=%s queryFields=%s body=%s return=%s",
+				op.Name,
+				strings.ToUpper(op.Method),
+				op.Path,
+				op.Group,
+				isPageQuery,
+				formatRawParamNames(raw.PathParams, false),
+				formatQueryLog(op.Query, isPageQuery),
+				formatRawParamNames(raw.QueryParams, isPageQuery),
+				formatBodyLog(op.Body),
+				op.Return.Type,
+			)
+		}
 
 		ops = append(ops, op)
 	}
@@ -516,6 +534,56 @@ func buildErrorText(summary string) string {
 		return trimmed
 	}
 	return trimmed + "失败"
+}
+
+func formatRawParamNames(params []RawParam, excludePage bool) string {
+	if len(params) == 0 {
+		return "-"
+	}
+	names := make([]string, 0, len(params))
+	for _, param := range params {
+		if excludePage && isPageParamName(param.Name) {
+			continue
+		}
+		if param.Name == "" {
+			continue
+		}
+		names = append(names, param.Name)
+	}
+	if len(names) == 0 {
+		return "-"
+	}
+	return strings.Join(names, ",")
+}
+
+func formatQueryLog(query *QueryInfo, isPageQuery bool) string {
+	if query == nil {
+		return "-"
+	}
+	suffix := ""
+	if query.Optional {
+		suffix = "?"
+	}
+	pageSuffix := ""
+	if isPageQuery {
+		pageSuffix = "+PageParam"
+	}
+	return query.TypeName + suffix + pageSuffix
+}
+
+func formatBodyLog(body *BodyInfo) string {
+	if body == nil {
+		return "-"
+	}
+	suffix := ""
+	if body.Optional {
+		suffix = "?"
+	}
+	formSuffix := ""
+	if body.IsForm {
+		formSuffix = "(form)"
+	}
+	return body.TypeName + suffix + formSuffix
 }
 
 func SplitAndRenderAPI(ops []Operation, modelImports []string, usesPageResult bool) []string {

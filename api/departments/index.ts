@@ -7,6 +7,20 @@ import type {
 } from './model';
 
 /**
+ * 查询部门列表
+ * @param params - 查询参数
+ * @returns Promise<PageResult<Department>>
+ */
+export async function queryDepartments(params?: DepartmentsQueryParam) {
+  const res = await request.get<ApiResult<PageResult<Department>>>('/api/v1/departments', { params });
+  if (res.data.success && res.data.data !== undefined) {
+    return res.data.data;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '查询部门列表失败'));
+}
+
+
+/**
  * 创建部门
  * @param data - 请求数据
  * @returns Promise<Department>
@@ -21,16 +35,16 @@ export async function createDepartment(data: DepartmentForm) {
 
 
 /**
- * 查询部门列表
- * @param params - 查询参数
- * @returns Promise<PageResult<Department>>
+ * 根据ID获取部门
+ * @param id - 唯一 ID
+ * @returns Promise<Department>
  */
-export async function queryDepartments(params?: DepartmentsQueryParam) {
-  const res = await request.get<ApiResult<PageResult<Department>>>('/api/v1/departments', { params });
+export async function getDepartment(id: string) {
+  const res = await request.get<ApiResult<Department>>(`/api/v1/departments/${id}`);
   if (res.data.success && res.data.data !== undefined) {
     return res.data.data;
   }
-  return Promise.reject(new Error(res.data.error?.message ?? '查询部门列表失败'));
+  return Promise.reject(new Error(res.data.error?.message ?? '根据ID获取部门失败'));
 }
 
 
@@ -60,19 +74,5 @@ export async function deleteDepartment(id: string) {
     return;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '根据ID删除部门失败'));
-}
-
-
-/**
- * 根据ID获取部门
- * @param id - 唯一 ID
- * @returns Promise<Department>
- */
-export async function getDepartment(id: string) {
-  const res = await request.get<ApiResult<Department>>(`/api/v1/departments/${id}`);
-  if (res.data.success && res.data.data !== undefined) {
-    return res.data.data;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '根据ID获取部门失败'));
 }
 

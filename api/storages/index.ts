@@ -35,20 +35,6 @@ export async function createStorage(data: StorageForm) {
 
 
 /**
- * 根据ID删除存储
- * @param id - 唯一 ID
- * @returns Promise<void>
- */
-export async function deleteStorage(id: string) {
-  const res = await request.delete<ApiResult<void>>(`/api/v1/storages/${id}`);
-  if (res.data.success) {
-    return;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '根据ID删除存储失败'));
-}
-
-
-/**
  * 根据ID获取存储
  * @param id - 唯一 ID
  * @returns Promise<Storage>
@@ -74,5 +60,19 @@ export async function updateStorage(id: string, data: StorageForm) {
     return;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '根据ID更新存储配置失败'));
+}
+
+
+/**
+ * 根据ID删除存储
+ * @param id - 唯一 ID
+ * @returns Promise<void>
+ */
+export async function deleteStorage(id: string) {
+  const res = await request.delete<ApiResult<void>>(`/api/v1/storages/${id}`);
+  if (res.data.success) {
+    return;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '根据ID删除存储失败'));
 }
 

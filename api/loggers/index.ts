@@ -76,20 +76,6 @@ export async function getLoggerModules() {
 
 
 /**
- * 通过ID获取日志详情
- * @param id - 唯一 ID
- * @returns Promise<Logger>
- */
-export async function getLogger(id: string) {
-  const res = await request.get<ApiResult<Logger>>(`/api/v1/loggers/${id}`);
-  if (res.data.success && res.data.data !== undefined) {
-    return res.data.data;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '通过ID获取日志详情失败'));
-}
-
-
-/**
  * 按ID删除日志
  * @param id - 唯一 ID
  * @returns Promise<void>
@@ -100,5 +86,19 @@ export async function deleteLogger(id: string) {
     return;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '按ID删除日志失败'));
+}
+
+
+/**
+ * 通过ID获取日志详情
+ * @param id - 唯一 ID
+ * @returns Promise<Logger>
+ */
+export async function getLogger(id: string) {
+  const res = await request.get<ApiResult<Logger>>(`/api/v1/loggers/${id}`);
+  if (res.data.success && res.data.data !== undefined) {
+    return res.data.data;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '通过ID获取日志详情失败'));
 }
 

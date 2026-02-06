@@ -35,6 +35,20 @@ export async function createMenu(data: MenuForm) {
 
 
 /**
+ * 根据ID删除菜单
+ * @param id - 唯一 ID
+ * @returns Promise<void>
+ */
+export async function deleteMenu(id: string) {
+  const res = await request.delete<ApiResult<void>>(`/api/v1/menus/${id}`);
+  if (res.data.success) {
+    return;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '根据ID删除菜单失败'));
+}
+
+
+/**
  * 根据ID获取菜单
  * @param id - 唯一 ID
  * @returns Promise<Menu>
@@ -60,19 +74,5 @@ export async function updateMenu(id: string, data: MenuForm) {
     return;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '根据ID更新菜单失败'));
-}
-
-
-/**
- * 根据ID删除菜单
- * @param id - 唯一 ID
- * @returns Promise<void>
- */
-export async function deleteMenu(id: string) {
-  const res = await request.delete<ApiResult<void>>(`/api/v1/menus/${id}`);
-  if (res.data.success) {
-    return;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '根据ID删除菜单失败'));
 }
 
