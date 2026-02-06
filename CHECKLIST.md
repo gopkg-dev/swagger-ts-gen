@@ -7,4 +7,4 @@
 - [x] 已执行 gofmt
 - [x] 已执行 go vet
 - [x] 已执行 go test ./...
-- 最近执行: 2026-02-06（gofmt/go vet/go test ./...）
+- 最近执行: 2026-02-06（gofmt/go mod tidy/go vet/go test ./...）

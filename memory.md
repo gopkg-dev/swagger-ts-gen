@@ -17,3 +17,4 @@
 - FormData generation now guards against undefined body and preserves indentation in generated TS.
 - Added verbose logging flag (-v/--verbose) to control runtime log output in CLI.
 - Verbose logging now prints per-operation details (method/path/query/body/return).
+- CLI framework switched to cobra (professional command line package).
