@@ -27,19 +27,6 @@ export async function socialLogin(data: SocialLoginForm) {
 
 
 /**
- * 获取已启用的第三方登录平台列表（公开接口）
- * @returns Promise<SocialProvider[]>
- */
-export async function getEnabledSocialProviders() {
-  const res = await request.get<ApiResult<SocialProvider[]>>('/api/v1/social/providers');
-  if (res.data.success && res.data.data !== undefined) {
-    return res.data.data;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '获取已启用的第三方登录平台列表（公开接口）失败'));
-}
-
-
-/**
  * 创建第三方登录平台配置
  * @param data - 请求数据
  * @returns Promise<SocialProvider>
@@ -54,6 +41,19 @@ export async function createSocialProvider(data: SocialProviderForm) {
 
 
 /**
+ * 获取已启用的第三方登录平台列表（公开接口）
+ * @returns Promise<SocialProvider[]>
+ */
+export async function getEnabledSocialProviders() {
+  const res = await request.get<ApiResult<SocialProvider[]>>('/api/v1/social/providers');
+  if (res.data.success && res.data.data !== undefined) {
+    return res.data.data;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '获取已启用的第三方登录平台列表（公开接口）失败'));
+}
+
+
+/**
  * 查询第三方登录平台配置列表
  * @param params - 查询参数
  * @returns Promise<PageResult<SocialProvider>>
@@ -64,6 +64,20 @@ export async function querySocialProviders(params?: SocialProvidersQueryParam) {
     return res.data.data;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '查询第三方登录平台配置列表失败'));
+}
+
+
+/**
+ * 根据ID删除第三方登录平台配置
+ * @param id - 唯一 ID
+ * @returns Promise<void>
+ */
+export async function deleteSocialProvider(id: string) {
+  const res = await request.delete<ApiResult<void>>(`/api/v1/social/providers/${id}`);
+  if (res.data.success) {
+    return;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '根据ID删除第三方登录平台配置失败'));
 }
 
 
@@ -97,20 +111,6 @@ export async function updateSocialProvider(id: string, data: SocialProviderForm)
 
 
 /**
- * 根据ID删除第三方登录平台配置
- * @param id - 唯一 ID
- * @returns Promise<void>
- */
-export async function deleteSocialProvider(id: string) {
-  const res = await request.delete<ApiResult<void>>(`/api/v1/social/providers/${id}`);
-  if (res.data.success) {
-    return;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '根据ID删除第三方登录平台配置失败'));
-}
-
-
-/**
  * 禁用第三方登录平台配置
  * @param id - 唯一 ID
  * @returns Promise<void>
@@ -135,6 +135,20 @@ export async function enableSocialProvider(id: string) {
     return;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '启用第三方登录平台配置失败'));
+}
+
+
+/**
+ * 获取授权链接（公开接口）
+ * @param source - 平台编码（如：GitHub、TikTok）
+ * @returns Promise<GetSocialAuthURLResult>
+ */
+export async function getSocialAuthURL(source: string) {
+  const res = await request.get<ApiResult<GetSocialAuthURLResult>>(`/api/v1/social/${source}`);
+  if (res.data.success && res.data.data !== undefined) {
+    return res.data.data;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '获取授权链接（公开接口）失败'));
 }
 
 
@@ -164,19 +178,5 @@ export async function unbindSocialAccount(source: string) {
     return res.data.data;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '解绑第三方账号（需登录）失败'));
-}
-
-
-/**
- * 获取授权链接（公开接口）
- * @param source - 平台编码（如：GitHub、TikTok）
- * @returns Promise<GetSocialAuthURLResult>
- */
-export async function getSocialAuthURL(source: string) {
-  const res = await request.get<ApiResult<GetSocialAuthURLResult>>(`/api/v1/social/${source}`);
-  if (res.data.success && res.data.data !== undefined) {
-    return res.data.data;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '获取授权链接（公开接口）失败'));
 }
 

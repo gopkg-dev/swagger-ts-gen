@@ -8,19 +8,6 @@ import type {
 } from './model';
 
 /**
- * 清空日志记录
- * @returns Promise<void>
- */
-export async function deleteAllLoggers() {
-  const res = await request.delete<ApiResult<void>>('/api/v1/loggers');
-  if (res.data.success) {
-    return;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '清空日志记录失败'));
-}
-
-
-/**
  * 查询日志列表
  * @param params - 查询参数
  * @returns Promise<PageResult<Logger>>
@@ -31,6 +18,19 @@ export async function queryLoggers(params?: LoggersQueryParam) {
     return res.data.data;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '查询日志列表失败'));
+}
+
+
+/**
+ * 清空日志记录
+ * @returns Promise<void>
+ */
+export async function deleteAllLoggers() {
+  const res = await request.delete<ApiResult<void>>('/api/v1/loggers');
+  if (res.data.success) {
+    return;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '清空日志记录失败'));
 }
 
 
@@ -76,20 +76,6 @@ export async function getLoggerModules() {
 
 
 /**
- * 按ID删除日志
- * @param id - 唯一 ID
- * @returns Promise<void>
- */
-export async function deleteLogger(id: string) {
-  const res = await request.delete<ApiResult<void>>(`/api/v1/loggers/${id}`);
-  if (res.data.success) {
-    return;
-  }
-  return Promise.reject(new Error(res.data.error?.message ?? '按ID删除日志失败'));
-}
-
-
-/**
  * 通过ID获取日志详情
  * @param id - 唯一 ID
  * @returns Promise<Logger>
@@ -100,5 +86,19 @@ export async function getLogger(id: string) {
     return res.data.data;
   }
   return Promise.reject(new Error(res.data.error?.message ?? '通过ID获取日志详情失败'));
+}
+
+
+/**
+ * 按ID删除日志
+ * @param id - 唯一 ID
+ * @returns Promise<void>
+ */
+export async function deleteLogger(id: string) {
+  const res = await request.delete<ApiResult<void>>(`/api/v1/loggers/${id}`);
+  if (res.data.success) {
+    return;
+  }
+  return Promise.reject(new Error(res.data.error?.message ?? '按ID删除日志失败'));
 }
 
