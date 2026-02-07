@@ -13,6 +13,7 @@
                     "验证码"
                 ],
                 "summary": "发送邮箱验证码",
+                "operationId": "sendMailCaptcha",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -52,6 +53,7 @@
                     "验证码"
                 ],
                 "summary": "获取图片验证码ID",
+                "operationId": "getCaptcha",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -80,6 +82,7 @@
                     "验证码"
                 ],
                 "summary": "返回验证码图片",
+                "operationId": "getCaptchaContent",
                 "parameters": [
                     {
                         "type": "string",
@@ -134,6 +137,7 @@
                     "代码生成"
                 ],
                 "summary": "查询生成配置列表",
+                "operationId": "queryGenConfigs",
                 "parameters": [
                     {
                         "type": "integer",
@@ -215,8 +219,8 @@
                     },
                     {
                         "enum": [
-                            "DESC",
-                            "ASC"
+                            "desc",
+                            "asc"
                         ],
                         "type": "string",
                         "description": "排序方向",
@@ -272,6 +276,7 @@
                     "代码生成"
                 ],
                 "summary": "获取生成配置详情",
+                "operationId": "getGenConfig",
                 "parameters": [
                     {
                         "type": "string",
@@ -330,6 +335,7 @@
                     "代码生成"
                 ],
                 "summary": "更新生成配置",
+                "operationId": "updateGenConfig",
                 "parameters": [
                     {
                         "type": "string",
@@ -340,7 +346,7 @@
                     },
                     {
                         "description": "配置信息",
-                        "name": "body",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -393,6 +399,7 @@
                     "代码生成"
                 ],
                 "summary": "查询字段配置列表",
+                "operationId": "queryGenFieldConfigs",
                 "parameters": [
                     {
                         "type": "integer",
@@ -488,8 +495,8 @@
                     },
                     {
                         "enum": [
-                            "DESC",
-                            "ASC"
+                            "desc",
+                            "asc"
                         ],
                         "type": "string",
                         "description": "排序方向",
@@ -545,6 +552,7 @@
                     "代码生成"
                 ],
                 "summary": "生成代码",
+                "operationId": "generateCode",
                 "parameters": [
                     {
                         "type": "string",
@@ -605,6 +613,7 @@
                     "公共接口"
                 ],
                 "summary": "查询参数字典",
+                "operationId": "queryOptionDicts",
                 "parameters": [
                     {
                         "type": "string",
@@ -656,6 +665,7 @@
                     "公共接口"
                 ],
                 "summary": "查询系统配置参数",
+                "operationId": "querySiteOptionDicts",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -704,6 +714,7 @@
                     "公共接口"
                 ],
                 "summary": "查询角色字典",
+                "operationId": "queryRoleDicts",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -752,6 +763,7 @@
                     "公共接口"
                 ],
                 "summary": "查询用户字典",
+                "operationId": "queryUserDicts",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -800,6 +812,7 @@
                     "公共接口"
                 ],
                 "summary": "字典查询",
+                "operationId": "queryCommonDicts",
                 "parameters": [
                     {
                         "type": "string",
@@ -860,6 +873,7 @@
                     "公共接口"
                 ],
                 "summary": "上传文件",
+                "operationId": "uploadCommonFile",
                 "parameters": [
                     {
                         "type": "file",
@@ -920,6 +934,7 @@
                     "公共接口"
                 ],
                 "summary": "查询部门树",
+                "operationId": "queryDeptTree",
                 "parameters": [
                     {
                         "enum": [
@@ -944,8 +959,8 @@
                     },
                     {
                         "enum": [
-                            "DESC",
-                            "ASC"
+                            "desc",
+                            "asc"
                         ],
                         "type": "string",
                         "description": "排序方向",
@@ -1010,6 +1025,7 @@
                     "个人中心"
                 ],
                 "summary": "修改头像",
+                "operationId": "updateCurrentAvatar",
                 "parameters": [
                     {
                         "type": "file",
@@ -1058,6 +1074,7 @@
                     "登录接口"
                 ],
                 "summary": "登出",
+                "operationId": "logout",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1085,6 +1102,7 @@
                     "登录接口"
                 ],
                 "summary": "获取路由信息",
+                "operationId": "queryCurrentMenus",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1133,6 +1151,7 @@
                     "个人中心"
                 ],
                 "summary": "修改密码",
+                "operationId": "updateCurrentPassword",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -1183,6 +1202,7 @@
                     "登录接口"
                 ],
                 "summary": "查询权限数据",
+                "operationId": "queryCurrentPermissions",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1228,6 +1248,7 @@
                     "登录接口"
                 ],
                 "summary": "刷新当前访问令牌",
+                "operationId": "refreshToken",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1272,7 +1293,8 @@
                 "tags": [
                     "第三方登录"
                 ],
-                "summary": "查询当前用户已绑定的第三方账号（需登录）",
+                "summary": "已绑定三方账号列表",
+                "operationId": "getCurrentSocialBindings",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1321,6 +1343,7 @@
                     "个人中心"
                 ],
                 "summary": "获取用户信息",
+                "operationId": "getUserInfo",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1364,6 +1387,7 @@
                     "个人中心"
                 ],
                 "summary": "修改基础信息",
+                "operationId": "updateCurrentUser",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -1414,6 +1438,7 @@
                     "部门管理"
                 ],
                 "summary": "查询部门列表",
+                "operationId": "queryDepartments",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1460,8 +1485,8 @@
                     },
                     {
                         "enum": [
-                            "DESC",
-                            "ASC"
+                            "desc",
+                            "asc"
                         ],
                         "type": "string",
                         "description": "排序方向",
@@ -1471,7 +1496,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "查询成功",
                         "schema": {
                             "allOf": [
                                 {
@@ -1481,10 +1506,22 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/schema.Department"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/fiberx.PaginationData"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/schema.Department"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -1515,6 +1552,7 @@
                     "部门管理"
                 ],
                 "summary": "创建部门",
+                "operationId": "createDepartment",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -1577,6 +1615,7 @@
                     "部门管理"
                 ],
                 "summary": "根据ID获取部门",
+                "operationId": "getDepartment",
                 "parameters": [
                     {
                         "type": "string",
@@ -1629,6 +1668,7 @@
                     "部门管理"
                 ],
                 "summary": "根据ID更新部门",
+                "operationId": "updateDepartment",
                 "parameters": [
                     {
                         "type": "string",
@@ -1684,6 +1724,7 @@
                     "部门管理"
                 ],
                 "summary": "根据ID删除部门",
+                "operationId": "deleteDepartment",
                 "parameters": [
                     {
                         "type": "string",
@@ -1726,6 +1767,7 @@
                     "字典项管理"
                 ],
                 "summary": "查询字典项列表",
+                "operationId": "queryDictItems",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1774,7 +1816,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "查询成功",
                         "schema": {
                             "allOf": [
                                 {
@@ -1784,10 +1826,22 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/schema.DictItem"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/fiberx.PaginationData"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/schema.DictItem"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -1818,6 +1872,7 @@
                     "字典项管理"
                 ],
                 "summary": "创建字典项",
+                "operationId": "createDictItem",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -1878,6 +1933,7 @@
                     "字典项管理"
                 ],
                 "summary": "批量删除字典项",
+                "operationId": "deleteDictItems",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -1928,6 +1984,7 @@
                     "字典项管理"
                 ],
                 "summary": "根据ID获取字典项",
+                "operationId": "getDictItem",
                 "parameters": [
                     {
                         "type": "string",
@@ -1980,6 +2037,7 @@
                     "字典项管理"
                 ],
                 "summary": "根据ID更新字典项",
+                "operationId": "updateDictItem",
                 "parameters": [
                     {
                         "type": "string",
@@ -2037,6 +2095,7 @@
                     "字典管理"
                 ],
                 "summary": "查询字典列表",
+                "operationId": "queryDicts",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2078,7 +2137,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "查询成功",
                         "schema": {
                             "allOf": [
                                 {
@@ -2088,10 +2147,22 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/schema.Dict"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/fiberx.PaginationData"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/schema.Dict"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -2122,6 +2193,7 @@
                     "字典管理"
                 ],
                 "summary": "创建字典",
+                "operationId": "createDict",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -2184,6 +2256,7 @@
                     "字典管理"
                 ],
                 "summary": "根据ID获取字典",
+                "operationId": "getDict",
                 "parameters": [
                     {
                         "type": "string",
@@ -2236,6 +2309,7 @@
                     "字典管理"
                 ],
                 "summary": "根据ID更新字典",
+                "operationId": "updateDict",
                 "parameters": [
                     {
                         "type": "string",
@@ -2291,6 +2365,7 @@
                     "字典管理"
                 ],
                 "summary": "根据ID删除字典",
+                "operationId": "deleteDict",
                 "parameters": [
                     {
                         "type": "string",
@@ -2336,6 +2411,7 @@
                     "文件管理"
                 ],
                 "summary": "上传文件",
+                "operationId": "uploadFile",
                 "parameters": [
                     {
                         "type": "file",
@@ -2397,6 +2473,7 @@
                     "日志管理"
                 ],
                 "summary": "查询日志列表",
+                "operationId": "queryLoggers",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2428,6 +2505,10 @@
                     },
                     {
                         "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
                         "description": "创建人ID列表",
                         "name": "userIds",
                         "in": "query"
@@ -2495,8 +2576,8 @@
                     },
                     {
                         "enum": [
-                            "DESC",
-                            "ASC"
+                            "desc",
+                            "asc"
                         ],
                         "type": "string",
                         "description": "排序方向",
@@ -2506,7 +2587,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "查询成功",
                         "schema": {
                             "allOf": [
                                 {
@@ -2516,10 +2597,22 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/schema.Logger"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/fiberx.PaginationData"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/schema.Logger"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -2550,6 +2643,7 @@
                     "日志管理"
                 ],
                 "summary": "清空日志记录",
+                "operationId": "deleteAllLoggers",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2583,9 +2677,14 @@
                     "日志管理"
                 ],
                 "summary": "批量删除日志",
+                "operationId": "deleteLoggersByIds",
                 "parameters": [
                     {
                         "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
                         "description": "日志 ID 数组",
                         "name": "ids",
                         "in": "query",
@@ -2625,6 +2724,7 @@
                     "日志管理"
                 ],
                 "summary": "按模块删除日志",
+                "operationId": "deleteLoggersByModule",
                 "parameters": [
                     {
                         "type": "string",
@@ -2667,6 +2767,7 @@
                     "日志管理"
                 ],
                 "summary": "获取日志模块列表",
+                "operationId": "getLoggerModules",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2715,6 +2816,7 @@
                     "日志管理"
                 ],
                 "summary": "通过ID获取日志详情",
+                "operationId": "getLogger",
                 "parameters": [
                     {
                         "type": "string",
@@ -2767,6 +2869,7 @@
                     "日志管理"
                 ],
                 "summary": "按ID删除日志",
+                "operationId": "deleteLogger",
                 "parameters": [
                     {
                         "type": "string",
@@ -2804,6 +2907,7 @@
                     "登录接口"
                 ],
                 "summary": "账号登录",
+                "operationId": "login",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -2860,6 +2964,7 @@
                     "菜单管理"
                 ],
                 "summary": "查询菜单列表",
+                "operationId": "queryMenus",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2910,7 +3015,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "查询成功",
                         "schema": {
                             "allOf": [
                                 {
@@ -2920,10 +3025,22 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/schema.Menu"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/fiberx.PaginationData"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/schema.Menu"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -2954,6 +3071,7 @@
                     "菜单管理"
                 ],
                 "summary": "创建菜单",
+                "operationId": "createMenu",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -3016,6 +3134,7 @@
                     "菜单管理"
                 ],
                 "summary": "根据ID获取菜单",
+                "operationId": "getMenu",
                 "parameters": [
                     {
                         "type": "string",
@@ -3068,6 +3187,7 @@
                     "菜单管理"
                 ],
                 "summary": "根据ID更新菜单",
+                "operationId": "updateMenu",
                 "parameters": [
                     {
                         "type": "string",
@@ -3123,6 +3243,7 @@
                     "菜单管理"
                 ],
                 "summary": "根据ID删除菜单",
+                "operationId": "deleteMenu",
                 "parameters": [
                     {
                         "type": "string",
@@ -3165,6 +3286,7 @@
                     "系统监控"
                 ],
                 "summary": "获取系统监控信息",
+                "operationId": "getMonitorData",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -3210,6 +3332,7 @@
                     "参数管理"
                 ],
                 "summary": "查询参数列表",
+                "operationId": "queryOptions",
                 "parameters": [
                     {
                         "enum": [
@@ -3224,6 +3347,10 @@
                     },
                     {
                         "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
                         "description": "参数键数组",
                         "name": "codes",
                         "in": "query"
@@ -3275,6 +3402,7 @@
                     "参数管理"
                 ],
                 "summary": "批量更新参数",
+                "operationId": "updateOptions",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -3326,6 +3454,7 @@
                     "参数管理"
                 ],
                 "summary": "重置参数为默认值",
+                "operationId": "resetOptions",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -3376,6 +3505,7 @@
                     "角色管理"
                 ],
                 "summary": "查询角色列表",
+                "operationId": "queryRoles",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3421,7 +3551,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "查询成功",
                         "schema": {
                             "allOf": [
                                 {
@@ -3431,10 +3561,22 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/schema.Role"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/fiberx.PaginationData"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/schema.Role"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -3465,6 +3607,7 @@
                     "角色管理"
                 ],
                 "summary": "创建角色",
+                "operationId": "createRole",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -3527,6 +3670,7 @@
                     "角色管理"
                 ],
                 "summary": "批量添加用户到角色",
+                "operationId": "addRoleUsers",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -3569,6 +3713,7 @@
                     "角色管理"
                 ],
                 "summary": "批量移除角色下的用户",
+                "operationId": "deleteRoleUsers",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -3613,6 +3758,7 @@
                     "角色管理"
                 ],
                 "summary": "根据ID获取角色",
+                "operationId": "getRole",
                 "parameters": [
                     {
                         "type": "string",
@@ -3665,6 +3811,7 @@
                     "角色管理"
                 ],
                 "summary": "根据ID更新角色",
+                "operationId": "updateRole",
                 "parameters": [
                     {
                         "type": "string",
@@ -3720,6 +3867,7 @@
                     "角色管理"
                 ],
                 "summary": "根据ID删除角色",
+                "operationId": "deleteRole",
                 "parameters": [
                     {
                         "type": "string",
@@ -3762,6 +3910,7 @@
                     "角色管理"
                 ],
                 "summary": "获取角色的数据权限",
+                "operationId": "getRoleDataScope",
                 "parameters": [
                     {
                         "type": "string",
@@ -3814,6 +3963,7 @@
                     "角色管理"
                 ],
                 "summary": "保存角色的数据权限",
+                "operationId": "saveRoleDataScope",
                 "parameters": [
                     {
                         "type": "string",
@@ -3871,6 +4021,7 @@
                     "角色管理"
                 ],
                 "summary": "获取角色的菜单权限数据",
+                "operationId": "getRoleMenuData",
                 "parameters": [
                     {
                         "type": "string",
@@ -3923,6 +4074,7 @@
                     "角色管理"
                 ],
                 "summary": "保存角色的菜单权限数据",
+                "operationId": "saveRoleMenuData",
                 "parameters": [
                     {
                         "type": "string",
@@ -3969,501 +4121,13 @@
                 }
             }
         },
-        "/api/v1/social/login": {
-            "post": {
-                "tags": [
-                    "第三方登录"
-                ],
-                "summary": "第三方登录（公开接口）",
-                "parameters": [
-                    {
-                        "description": "登录参数（前端回调携带的参数）",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/schema.SocialLoginForm"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "返回授权 token",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/fiberx.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/schema.LoginToken"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/social/providers": {
+        "/api/v1/social/auth-url/{source}": {
             "get": {
                 "tags": [
                     "第三方登录"
                 ],
-                "summary": "获取已启用的第三方登录平台列表（公开接口）",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/fiberx.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/schema.SocialProvider"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "tags": [
-                    "第三方登录配置"
-                ],
-                "summary": "创建第三方登录平台配置",
-                "parameters": [
-                    {
-                        "description": "请求体",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/schema.SocialProviderForm"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/fiberx.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/schema.SocialProvider"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/social/providers/page": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "tags": [
-                    "第三方登录配置"
-                ],
-                "summary": "查询第三方登录平台配置列表",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "分页页码",
-                        "name": "current",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "分页大小",
-                        "name": "pageSize",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "平台名称（模糊查询）",
-                        "name": "name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "平台编码",
-                        "name": "code",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "oauth2",
-                            "oidc",
-                            "saml"
-                        ],
-                        "type": "string",
-                        "description": "提供商类型",
-                        "name": "providerType",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "disable",
-                            "enable"
-                        ],
-                        "type": "string",
-                        "description": "状态",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "select"
-                        ],
-                        "type": "string",
-                        "description": "结果类型",
-                        "name": "resultType",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/fiberx.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/schema.SocialProvider"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/social/providers/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "tags": [
-                    "第三方登录配置"
-                ],
-                "summary": "根据ID获取第三方登录平台配置",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "唯一 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/fiberx.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/schema.SocialProvider"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "tags": [
-                    "第三方登录配置"
-                ],
-                "summary": "根据ID更新第三方登录平台配置",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "唯一 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "请求体",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/schema.SocialProviderForm"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "tags": [
-                    "第三方登录配置"
-                ],
-                "summary": "根据ID删除第三方登录平台配置",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "唯一 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/social/providers/{id}/disable": {
-            "patch": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "tags": [
-                    "第三方登录配置"
-                ],
-                "summary": "禁用第三方登录平台配置",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "唯一 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/social/providers/{id}/enable": {
-            "patch": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "tags": [
-                    "第三方登录配置"
-                ],
-                "summary": "启用第三方登录平台配置",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "唯一 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/fiberx.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/social/{source}": {
-            "get": {
-                "tags": [
-                    "第三方登录"
-                ],
-                "summary": "获取授权链接（公开接口）",
+                "summary": "获取授权链接",
+                "operationId": "getSocialAuthURL",
                 "parameters": [
                     {
                         "type": "string",
@@ -4510,7 +4174,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/api/v1/social/bind": {
             "post": {
                 "security": [
                     {
@@ -4520,15 +4186,9 @@
                 "tags": [
                     "第三方登录"
                 ],
-                "summary": "绑定第三方账号（需登录）",
+                "summary": "绑定第三方账号",
+                "operationId": "bindSocialAccount",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "平台编码（如：GitHub、TikTok）",
-                        "name": "source",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "绑定参数（前端回调携带的参数）",
                         "name": "request",
@@ -4582,7 +4242,245 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/api/v1/social/enabled-providers": {
+            "get": {
+                "tags": [
+                    "第三方登录"
+                ],
+                "summary": "已启用三方登录平台列表",
+                "operationId": "getEnabledSocialProviders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/fiberx.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/schema.SocialProvider"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/fiberx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/social/login": {
+            "post": {
+                "tags": [
+                    "第三方登录"
+                ],
+                "summary": "第三方登录",
+                "operationId": "socialLogin",
+                "parameters": [
+                    {
+                        "description": "登录参数（前端回调携带的参数）",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schema.SocialLoginForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回授权 token",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/fiberx.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/schema.LoginToken"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/fiberx.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/fiberx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/social/providers": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "第三方登录"
+                ],
+                "summary": "查询三方登录配置列表",
+                "operationId": "querySocialProviders",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "分页页码",
+                        "name": "current",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "分页大小",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "select"
+                        ],
+                        "type": "string",
+                        "description": "结果类型",
+                        "name": "resultType",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "查询成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/fiberx.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/fiberx.PaginationData"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/schema.SocialProvider"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/fiberx.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/fiberx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/social/providers/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "第三方登录"
+                ],
+                "summary": "更新三方登录配置",
+                "operationId": "updateSocialProvider",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "唯一 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schema.SocialProviderForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fiberx.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/fiberx.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/fiberx.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/fiberx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/social/{source}": {
             "delete": {
                 "security": [
                     {
@@ -4592,7 +4490,8 @@
                 "tags": [
                     "第三方登录"
                 ],
-                "summary": "解绑第三方账号（需登录）",
+                "summary": "解绑第三方账号",
+                "operationId": "unbindSocialAccount",
                 "parameters": [
                     {
                         "type": "string",
@@ -4658,6 +4557,7 @@
                     "存储管理"
                 ],
                 "summary": "查询存储列表",
+                "operationId": "queryStorages",
                 "parameters": [
                     {
                         "type": "integer",
@@ -4713,8 +4613,8 @@
                     },
                     {
                         "enum": [
-                            "DESC",
-                            "ASC"
+                            "desc",
+                            "asc"
                         ],
                         "type": "string",
                         "description": "排序方向",
@@ -4733,7 +4633,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "查询成功",
                         "schema": {
                             "allOf": [
                                 {
@@ -4743,10 +4643,22 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/schema.Storage"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/fiberx.PaginationData"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/schema.Storage"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -4777,6 +4689,7 @@
                     "存储管理"
                 ],
                 "summary": "创建存储",
+                "operationId": "createStorage",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -4839,6 +4752,7 @@
                     "存储管理"
                 ],
                 "summary": "根据ID获取存储",
+                "operationId": "getStorage",
                 "parameters": [
                     {
                         "type": "string",
@@ -4891,6 +4805,7 @@
                     "存储管理"
                 ],
                 "summary": "根据ID更新存储配置",
+                "operationId": "updateStorage",
                 "parameters": [
                     {
                         "type": "string",
@@ -4946,6 +4861,7 @@
                     "存储管理"
                 ],
                 "summary": "根据ID删除存储",
+                "operationId": "deleteStorage",
                 "parameters": [
                     {
                         "type": "string",
@@ -4988,6 +4904,7 @@
                     "接口管理"
                 ],
                 "summary": "查询接口列表",
+                "operationId": "queryApis",
                 "parameters": [
                     {
                         "type": "integer",
@@ -5043,7 +4960,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "查询成功",
                         "schema": {
                             "allOf": [
                                 {
@@ -5053,10 +4970,22 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/schema.Api"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/fiberx.PaginationData"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/schema.Api"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -5087,6 +5016,7 @@
                     "接口管理"
                 ],
                 "summary": "批量删除接口",
+                "operationId": "deleteApis",
                 "parameters": [
                     {
                         "description": "请求体",
@@ -5138,6 +5068,7 @@
                     "接口管理"
                 ],
                 "summary": "同步 Swagger 接口",
+                "operationId": "syncApis",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -5184,6 +5115,7 @@
                     "接口管理"
                 ],
                 "summary": "获取所有接口分组标签",
+                "operationId": "getApiTags",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -5232,6 +5164,7 @@
                     "接口管理"
                 ],
                 "summary": "根据ID获取接口",
+                "operationId": "getApi",
                 "parameters": [
                     {
                         "type": "string",
@@ -5366,8 +5299,8 @@
                     },
                     {
                         "enum": [
-                            "DESC",
-                            "ASC"
+                            "desc",
+                            "asc"
                         ],
                         "type": "string",
                         "description": "排序方向",
@@ -5376,6 +5309,10 @@
                     },
                     {
                         "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
                         "description": "角色ID数组",
                         "name": "roleIds",
                         "in": "query"
@@ -5410,7 +5347,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "查询成功",
                         "schema": {
                             "allOf": [
                                 {
@@ -5420,10 +5357,22 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/schema.User"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/fiberx.PaginationData"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/schema.User"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -5891,6 +5840,15 @@
                     "description": "error reason",
                     "type": "string"
                 }
+            }
+        },
+        "fiberx.PaginationData": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "list": {}
             }
         },
         "fiberx.Response": {
@@ -7789,28 +7747,8 @@
                     "description": "平台编码（唯一标识，如：github、tiktok）",
                     "type": "string"
                 },
-                "createUser": {
-                    "description": "创建人",
-                    "type": "string"
-                },
-                "createUserName": {
-                    "description": "创建人用户名",
-                    "type": "string"
-                },
-                "createdAt": {
-                    "description": "创建时间",
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "description": "删除时间（软删除）",
-                    "type": "string"
-                },
                 "description": {
                     "description": "描述信息",
-                    "type": "string"
-                },
-                "iconUrl": {
-                    "description": "平台图标 URL",
                     "type": "string"
                 },
                 "id": {
@@ -7883,11 +7821,6 @@
                     "description": "描述信息",
                     "type": "string",
                     "maxLength": 200
-                },
-                "iconUrl": {
-                    "description": "平台图标 URL",
-                    "type": "string",
-                    "maxLength": 500
                 },
                 "name": {
                     "description": "平台名称",

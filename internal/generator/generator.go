@@ -374,7 +374,7 @@ func resolveReturnType(opName string, schemaRef *openapi3.SchemaRef, registry *T
 		return ReturnInfo{Type: "any"}, nil
 	}
 
-	if listItems := extractPageListItems(schema.Value, registry); listItems != nil {
+	if listItems := extractPageListItems(schema, registry); listItems != nil {
 		itemType := registry.SchemaToType(listItems, nil)
 		used := collectTypeNamesFromSchema(listItems, registry)
 		return ReturnInfo{Type: "PageResult<" + itemType + ">", UsesPageResult: true}, used
@@ -393,26 +393,86 @@ func resolveReturnType(opName string, schemaRef *openapi3.SchemaRef, registry *T
 	return ReturnInfo{Type: inlineName}, []string{inlineName}
 }
 
-func extractPageListItems(schema *openapi3.Schema, registry *TypeRegistry) *openapi3.SchemaRef {
-	if schema == nil || schema.Type == nil || !schema.Type.Is("object") {
+type paginationShape struct {
+	ListSchema *openapi3.SchemaRef
+	HasCount   bool
+}
+
+func extractPageListItems(schemaRef *openapi3.SchemaRef, registry *TypeRegistry) *openapi3.SchemaRef {
+	shape := collectPaginationShape(schemaRef, registry, map[*openapi3.SchemaRef]struct{}{})
+	if !shape.HasCount || shape.ListSchema == nil {
 		return nil
 	}
-	if schema.Properties == nil {
+	resolvedListSchema := derefSchemaRef(shape.ListSchema, registry)
+	if resolvedListSchema == nil || resolvedListSchema.Value == nil {
 		return nil
 	}
-	listSchema := schema.Properties["list"]
-	countSchema := schema.Properties["count"]
-	if listSchema == nil || countSchema == nil {
+	if resolvedListSchema.Value.Type == nil || !resolvedListSchema.Value.Type.Is("array") {
 		return nil
 	}
-	listSchema = derefSchemaRef(listSchema, registry)
-	if listSchema == nil || listSchema.Value == nil {
-		return nil
+	return resolvedListSchema.Value.Items
+}
+
+func collectPaginationShape(schemaRef *openapi3.SchemaRef, registry *TypeRegistry, visited map[*openapi3.SchemaRef]struct{}) paginationShape {
+	if schemaRef == nil {
+		return paginationShape{}
 	}
-	if listSchema.Value.Type == nil || !listSchema.Value.Type.Is("array") {
-		return nil
+	if _, ok := visited[schemaRef]; ok {
+		return paginationShape{}
 	}
-	return listSchema.Value.Items
+	visited[schemaRef] = struct{}{}
+
+	resolvedSchemaRef := derefSchemaRef(schemaRef, registry)
+	if resolvedSchemaRef == nil || resolvedSchemaRef.Value == nil {
+		return paginationShape{}
+	}
+
+	schema := resolvedSchemaRef.Value
+	shape := paginationShape{}
+
+	if schema.Properties != nil {
+		if _, ok := schema.Properties["count"]; ok {
+			shape.HasCount = true
+		}
+		shape.ListSchema = pickPreferredListSchema(shape.ListSchema, schema.Properties["list"], registry)
+	}
+
+	for _, part := range schema.AllOf {
+		partShape := collectPaginationShape(part, registry, visited)
+		shape.HasCount = shape.HasCount || partShape.HasCount
+		shape.ListSchema = pickPreferredListSchema(shape.ListSchema, partShape.ListSchema, registry)
+	}
+
+	return shape
+}
+
+func pickPreferredListSchema(current *openapi3.SchemaRef, candidate *openapi3.SchemaRef, registry *TypeRegistry) *openapi3.SchemaRef {
+	if candidate == nil {
+		return current
+	}
+	if current == nil {
+		return candidate
+	}
+	candidateIsArray := isArraySchema(candidate, registry)
+	currentIsArray := isArraySchema(current, registry)
+	if candidateIsArray && !currentIsArray {
+		return candidate
+	}
+	if candidateIsArray && currentIsArray {
+		return candidate
+	}
+	return current
+}
+
+func isArraySchema(schemaRef *openapi3.SchemaRef, registry *TypeRegistry) bool {
+	resolvedSchemaRef := derefSchemaRef(schemaRef, registry)
+	if resolvedSchemaRef == nil || resolvedSchemaRef.Value == nil {
+		return false
+	}
+	if resolvedSchemaRef.Value.Type == nil {
+		return false
+	}
+	return resolvedSchemaRef.Value.Type.Is("array")
 }
 
 func collectTypeNamesFromSchema(schemaRef *openapi3.SchemaRef, registry *TypeRegistry) []string {

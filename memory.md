@@ -24,3 +24,4 @@
 - Generator now always writes outputDir/index.ts with ApiError/ApiResult/PageParam/PageResult base interfaces for go-fiber-admin frontend conventions.
 - Module path changed to github.com/gopkg-dev/swagger-ts-gen; README installation switched to go install github.com/gopkg-dev/swagger-ts-gen/cmd/swagger-ts@latest.
 - Added a root .gitignore with Go build artifacts, editor/system files, logs/temp files, and output/ directory ignore rules.
+- Pagination return detection now supports allOf-composed data (e.g., Response{data=PaginationData{list=[]Model}}) and correctly emits PageResult<T> instead of intersection aliases.
