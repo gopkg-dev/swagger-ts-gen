@@ -279,14 +279,14 @@ func RenderOperation(op Operation) string {
 		b.WriteString("  if (res.data.success) {\n")
 		b.WriteString("    return;\n")
 		b.WriteString("  }\n")
-		b.WriteString("  return Promise.reject(new Error(res.data.error?.message ?? '")
+		b.WriteString("  return Promise.reject(new Error(res.data?.message ?? '")
 		b.WriteString(escapeSingleQuotes(op.ErrorText))
 		b.WriteString("'));\n")
 	} else {
 		b.WriteString("  if (res.data.success && res.data.data !== undefined) {\n")
 		b.WriteString("    return res.data.data;\n")
 		b.WriteString("  }\n")
-		b.WriteString("  return Promise.reject(new Error(res.data.error?.message ?? '")
+		b.WriteString("  return Promise.reject(new Error(res.data?.message ?? '")
 		b.WriteString(escapeSingleQuotes(op.ErrorText))
 		b.WriteString("'));\n")
 	}

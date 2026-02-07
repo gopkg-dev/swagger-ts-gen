@@ -299,26 +299,20 @@ func isPageParamName(name string) bool {
 	return name == "current" || name == "pageSize"
 }
 
-const queryPrefix = "query"
-
 func buildQueryParamTypeName(operationName string, groupName string) string {
 	trimmed := strings.TrimSpace(operationName)
-	if trimmed == "" {
-		return "QueryParam"
+	if trimmed != "" {
+		if strings.HasSuffix(strings.ToLower(trimmed), "param") {
+			return trimmed
+		}
+		return trimmed + "Param"
 	}
-	if strings.EqualFold(trimmed, queryPrefix) {
-		return "QueryParam"
-	}
-	lower := strings.ToLower(trimmed)
-	if strings.HasPrefix(lower, queryPrefix) && len(trimmed) > len(queryPrefix) {
-		base := trimmed[len(queryPrefix):]
-		return base + "QueryParam"
-	}
+
 	group := strings.TrimSpace(groupName)
 	if group != "" {
-		return group + "QueryParam"
+		return group + "Param"
 	}
-	return trimmed + "QueryParam"
+	return "Param"
 }
 
 func buildPathParams(params []RawParam, registry *TypeRegistry) []Param {
