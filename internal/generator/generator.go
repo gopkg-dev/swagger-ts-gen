@@ -11,8 +11,11 @@ import (
 )
 
 type Options struct {
-	OutputDir string
-	Logf      func(string, ...any)
+	OutputDir           string
+	Logf                func(string, ...any)
+	GoSourceDir         string
+	GoSourceIncludeDirs []string
+	RequiredByOmitEmpty bool
 }
 
 type Report struct {
@@ -22,9 +25,13 @@ type Report struct {
 }
 
 type Generator struct {
-	spec      *openapi3.T
-	outputDir string
-	logf      func(string, ...any)
+	spec                 *openapi3.T
+	outputDir            string
+	logf                 func(string, ...any)
+	goSourceDir          string
+	goSourceIncludeDirs  []string
+	requiredByOmitEmpty  bool
+	optionalFieldsByType map[string][]GoStructOptionality
 }
 
 func New(spec *openapi3.T, opts Options) *Generator {
@@ -32,12 +39,32 @@ func New(spec *openapi3.T, opts Options) *Generator {
 	if output == "" {
 		output = "api"
 	}
-	return &Generator{spec: spec, outputDir: output, logf: opts.Logf}
+	return &Generator{
+		spec:                spec,
+		outputDir:           output,
+		logf:                opts.Logf,
+		goSourceDir:         strings.TrimSpace(opts.GoSourceDir),
+		goSourceIncludeDirs: normalizeGoSourceIncludeDirs(opts.GoSourceIncludeDirs),
+		requiredByOmitEmpty: opts.RequiredByOmitEmpty,
+	}
 }
 
 func (g *Generator) Generate() (*Report, error) {
 	if g.spec == nil {
 		return nil, fmt.Errorf("spec is nil")
+	}
+	if g.requiredByOmitEmpty {
+		if g.goSourceDir == "" {
+			return nil, fmt.Errorf("go source dir is required when required-by-omitempty is enabled")
+		}
+		optionalFieldsByType, err := ParseGoOptionalFieldsByType(g.goSourceDir, g.goSourceIncludeDirs)
+		if err != nil {
+			return nil, fmt.Errorf("load go optional fields failed: %w", err)
+		}
+		g.optionalFieldsByType = optionalFieldsByType
+		if g.logf != nil {
+			g.logf("go optional fields loaded: %d struct(s), include=%s", len(optionalFieldsByType), strings.Join(g.goSourceIncludeDirs, ","))
+		}
 	}
 
 	ops, err := ExtractOperations(g.spec)
@@ -115,6 +142,30 @@ func (g *Generator) Generate() (*Report, error) {
 	return report, nil
 }
 
+func normalizeGoSourceIncludeDirs(includeDirs []string) []string {
+	defaultIncludeDirs := []string{"schema", "fiberx"}
+	if len(includeDirs) == 0 {
+		return defaultIncludeDirs
+	}
+	normalized := make([]string, 0, len(includeDirs))
+	seen := map[string]struct{}{}
+	for _, includeDir := range includeDirs {
+		trimmed := strings.TrimSpace(includeDir)
+		if trimmed == "" {
+			continue
+		}
+		if _, exists := seen[trimmed]; exists {
+			continue
+		}
+		seen[trimmed] = struct{}{}
+		normalized = append(normalized, trimmed)
+	}
+	if len(normalized) == 0 {
+		return defaultIncludeDirs
+	}
+	return normalized
+}
+
 func renderTypeFile(content string, deps []string) string {
 	if len(deps) == 0 {
 		return content
@@ -137,6 +188,7 @@ func renderAPIIndex(parts int) string {
 
 func (g *Generator) buildGroupOperations(rawOps []RawOperation) ([]Operation, []string, bool, *TypeRegistry, error) {
 	registry := NewTypeRegistry(g.spec)
+	registry.SetOptionalFieldsByType(g.optionalFieldsByType)
 	usedTypes := map[string]struct{}{}
 	usesPageResult := false
 

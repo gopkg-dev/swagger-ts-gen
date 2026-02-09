@@ -45,12 +45,31 @@ func sanitizePathSegment(segment string) string {
 			cleaned = append(cleaned, '-')
 		}
 	}
-	result := strings.Trim(strings.Trim(string(cleaned), "-"), "_")
+	normalized := strings.Trim(strings.Trim(string(cleaned), "-"), "_")
+	if normalized == "" {
+		return "default"
+	}
+	words := splitWords(normalized)
+	if len(words) == 0 {
+		return "default"
+	}
+	var b strings.Builder
+	for idx, word := range words {
+		if word == "" {
+			continue
+		}
+		if idx == 0 {
+			b.WriteString(strings.ToLower(word))
+			continue
+		}
+		b.WriteString(upperFirst(word))
+	}
+	result := b.String()
 	if result == "" {
 		return "default"
 	}
 	if unicode.IsDigit(rune(result[0])) {
-		return "group-" + result
+		return "group" + result
 	}
 	return result
 }

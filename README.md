@@ -52,6 +52,9 @@ swagger-ts --help
 - `-i, --input`：Swagger/OpenAPI 文档路径或 URL（必填）
 - `-o, --output`：输出目录（默认 `api`）
 - `-v, --verbose`：开启详细日志
+- `--go-source`：Go 源码目录（用于 AST 可选性推断）
+- `--go-source-include`：AST 扫描目录名（逗号分隔，默认 `schema,fiberx`）
+- `--required-by-omitempty`：对象字段默认必填，仅 `omitempty` 字段输出可选（需配合 `--go-source`）
 
 缺少 `--input` 时会以退出码 `2` 退出；其他错误为退出码 `1`。
 
@@ -90,6 +93,7 @@ api/<group>/
 
 - 路径形如 `/api/v1/users`：分组为 `users`（跳过 `/api/v{n}` 前缀）
 - 其他路径：取第一个路径段作为分组名
+- 分组名会标准化为 lowerCamel（例如 `sys-api -> sysApi`、`dict-items -> dictItems`）
 
 ### 2) API 函数命名
 
@@ -112,6 +116,16 @@ api/<group>/
 
 - `multipart/form-data` 与 `application/x-www-form-urlencoded` 自动转 `FormData`
 - 非表单请求按普通 JSON 体生成
+
+### 6) 可选字段推断（可选能力）
+
+- 默认行为：仅根据 OpenAPI `required` 数组决定 TS 字段是否可选。
+- 开启 `--required-by-omitempty --go-source <dir>` 后：
+  - 先用 Go AST 解析结构体 `json` tag
+  - 扫描目录由 `--go-source-include` 决定（默认 `schema,fiberx`）
+  - 当 schema 缺失 `required` 时，按“默认必填、仅 `omitempty` 可选”生成 TS 字段。
+  - 若能匹配到 Go 结构体，会按 Go 字段声明顺序输出 TS 字段，前端阅读与后端定义保持一致。
+  - 若存在同名结构体冲突（不同包同名），会基于字段重叠度选择最匹配 schema 的结构体进行覆盖。
 
 ## 生成代码依赖约定
 

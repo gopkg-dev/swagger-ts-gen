@@ -116,16 +116,8 @@ func formatTypeAlias(name string, expr string, description string) string {
 }
 
 func formatInterface(name string, schema *openapi3.Schema, registry *TypeRegistry, deps map[string]struct{}, description string, extends []string) string {
-	required := map[string]struct{}{}
-	for _, key := range schema.Required {
-		required[key] = struct{}{}
-	}
-
-	var keys []string
-	for key := range schema.Properties {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
+	required := resolveRequiredFields(name, schema, registry)
+	keys := resolvePropertyOrder(name, schema, registry)
 
 	var b strings.Builder
 	if description != "" {
@@ -169,6 +161,133 @@ func formatInterface(name string, schema *openapi3.Schema, registry *TypeRegistr
 
 	b.WriteString("}\n")
 	return b.String()
+}
+
+func resolveRequiredFields(typeName string, schema *openapi3.Schema, registry *TypeRegistry) map[string]struct{} {
+	required := map[string]struct{}{}
+	if schema == nil {
+		return required
+	}
+
+	if len(schema.Required) > 0 {
+		for _, key := range schema.Required {
+			required[key] = struct{}{}
+		}
+		return required
+	}
+
+	if registry == nil || len(registry.optionalFieldsByType) == 0 {
+		return required
+	}
+
+	structCandidates, exists := registry.optionalFieldsByType[typeName]
+	if !exists || len(structCandidates) == 0 {
+		return required
+	}
+	bestCandidate, matched := pickBestGoStructOptionality(structCandidates, schema.Properties)
+	if !matched {
+		return required
+	}
+	optionalFields := bestCandidate.Fields
+	for propertyName := range schema.Properties {
+		if optionalFields[propertyName] {
+			continue
+		}
+		required[propertyName] = struct{}{}
+	}
+
+	return required
+}
+
+func resolvePropertyOrder(typeName string, schema *openapi3.Schema, registry *TypeRegistry) []string {
+	orderedKeys := make([]string, 0, len(schema.Properties))
+	if schema == nil || len(schema.Properties) == 0 {
+		return orderedKeys
+	}
+	if registry == nil || len(registry.optionalFieldsByType) == 0 {
+		return sortedPropertyKeys(schema.Properties)
+	}
+
+	structCandidates, exists := registry.optionalFieldsByType[typeName]
+	if !exists || len(structCandidates) == 0 {
+		return sortedPropertyKeys(schema.Properties)
+	}
+	bestCandidate, matched := pickBestGoStructOptionality(structCandidates, schema.Properties)
+	if !matched {
+		return sortedPropertyKeys(schema.Properties)
+	}
+
+	seen := map[string]struct{}{}
+	for _, propertyName := range bestCandidate.FieldOrder {
+		if _, exists := schema.Properties[propertyName]; !exists {
+			continue
+		}
+		if _, exists := seen[propertyName]; exists {
+			continue
+		}
+		seen[propertyName] = struct{}{}
+		orderedKeys = append(orderedKeys, propertyName)
+	}
+
+	missingKeys := make([]string, 0, len(schema.Properties))
+	for propertyName := range schema.Properties {
+		if _, exists := seen[propertyName]; exists {
+			continue
+		}
+		missingKeys = append(missingKeys, propertyName)
+	}
+	sort.Strings(missingKeys)
+	orderedKeys = append(orderedKeys, missingKeys...)
+	return orderedKeys
+}
+
+func sortedPropertyKeys(properties openapi3.Schemas) []string {
+	keys := make([]string, 0, len(properties))
+	for key := range properties {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
+func pickBestGoStructOptionality(candidates []GoStructOptionality, schemaProperties openapi3.Schemas) (GoStructOptionality, bool) {
+	if len(schemaProperties) == 0 || len(candidates) == 0 {
+		return GoStructOptionality{}, false
+	}
+
+	requiredSchemaCount := len(schemaProperties)
+	bestOverlap := -1
+	bestMissing := 1 << 30
+	bestCandidate := GoStructOptionality{}
+
+	for _, candidate := range candidates {
+		fieldOptionality := candidate.Fields
+		overlap := 0
+		for propertyName := range schemaProperties {
+			if _, exists := fieldOptionality[propertyName]; exists {
+				overlap++
+			}
+		}
+		missing := requiredSchemaCount - overlap
+		if overlap > bestOverlap || (overlap == bestOverlap && missing < bestMissing) {
+			bestOverlap = overlap
+			bestMissing = missing
+			bestCandidate = candidate
+		}
+	}
+
+	if bestOverlap <= 0 {
+		return GoStructOptionality{}, false
+	}
+	minOverlap := 1
+	if requiredSchemaCount >= 4 {
+		minOverlap = (requiredSchemaCount + 1) / 2
+	}
+	if bestOverlap < minOverlap {
+		return GoStructOptionality{}, false
+	}
+
+	return bestCandidate, true
 }
 
 func RenderModelIndex(typeNames []string) string {

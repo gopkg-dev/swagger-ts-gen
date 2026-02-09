@@ -17,20 +17,33 @@ type TypeDef struct {
 }
 
 type TypeRegistry struct {
-	doc       *openapi3.T
-	types     map[string]*TypeDef
-	nameTaken map[string]bool
-	refToName map[string]string
-	typeOrder []string
+	doc                  *openapi3.T
+	types                map[string]*TypeDef
+	nameTaken            map[string]bool
+	refToName            map[string]string
+	typeOrder            []string
+	optionalFieldsByType map[string][]GoStructOptionality
 }
 
 func NewTypeRegistry(doc *openapi3.T) *TypeRegistry {
 	return &TypeRegistry{
-		doc:       doc,
-		types:     map[string]*TypeDef{},
-		nameTaken: map[string]bool{},
-		refToName: map[string]string{},
+		doc:                  doc,
+		types:                map[string]*TypeDef{},
+		nameTaken:            map[string]bool{},
+		refToName:            map[string]string{},
+		optionalFieldsByType: map[string][]GoStructOptionality{},
 	}
+}
+
+func (r *TypeRegistry) SetOptionalFieldsByType(optionalFieldsByType map[string][]GoStructOptionality) {
+	if r == nil {
+		return
+	}
+	if optionalFieldsByType == nil {
+		r.optionalFieldsByType = map[string][]GoStructOptionality{}
+		return
+	}
+	r.optionalFieldsByType = optionalFieldsByType
 }
 
 func (r *TypeRegistry) RegisterRef(ref string) (string, error) {

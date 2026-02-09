@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -16,6 +17,9 @@ func main() {
 	var input string
 	var output string
 	var verbose bool
+	var goSourceDir string
+	var goSourceInclude string
+	var requiredByOmitEmpty bool
 	var logf func(string, ...any)
 
 	errMissingInput := errors.New("input is required: use -i or --input")
@@ -23,11 +27,15 @@ func main() {
 	rootCmd := &cobra.Command{
 		Use:           "swagger-ts",
 		Short:         "Generate TypeScript API client from Swagger/OpenAPI",
+		Args:          cobra.NoArgs,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if input == "" {
 				return errMissingInput
+			}
+			if requiredByOmitEmpty && goSourceDir == "" {
+				return errors.New("go source dir is required when --required-by-omitempty is enabled")
 			}
 
 			if verbose {
@@ -46,7 +54,13 @@ func main() {
 				logf("spec loaded: %s", meta.Version)
 			}
 
-			gen := generator.New(spec, generator.Options{OutputDir: output, Logf: logf})
+			gen := generator.New(spec, generator.Options{
+				OutputDir:           output,
+				Logf:                logf,
+				GoSourceDir:         goSourceDir,
+				GoSourceIncludeDirs: parseCommaSeparatedValues(goSourceInclude),
+				RequiredByOmitEmpty: requiredByOmitEmpty,
+			})
 			if logf != nil {
 				logf("generating output to %s", output)
 			}
@@ -68,6 +82,9 @@ func main() {
 	rootCmd.Flags().StringVarP(&input, "input", "i", "", "Swagger/OpenAPI json or yaml file path, or URL")
 	rootCmd.Flags().StringVarP(&output, "output", "o", "output", "output directory")
 	rootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose logging")
+	rootCmd.Flags().StringVar(&goSourceDir, "go-source", "", "go source directory for AST optionality inference")
+	rootCmd.Flags().StringVar(&goSourceInclude, "go-source-include", "schema,fiberx", "comma-separated go source subdirectories to scan for AST optionality inference")
+	rootCmd.Flags().BoolVar(&requiredByOmitEmpty, "required-by-omitempty", false, "default object fields to required, only omitempty fields are optional (requires --go-source)")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
@@ -76,4 +93,20 @@ func main() {
 		}
 		os.Exit(1)
 	}
+}
+
+func parseCommaSeparatedValues(input string) []string {
+	if input == "" {
+		return nil
+	}
+	parts := strings.Split(input, ",")
+	values := make([]string, 0, len(parts))
+	for _, part := range parts {
+		trimmed := strings.TrimSpace(part)
+		if trimmed == "" {
+			continue
+		}
+		values = append(values, trimmed)
+	}
+	return values
 }

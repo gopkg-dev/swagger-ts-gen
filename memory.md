@@ -16,6 +16,12 @@
 - QueryParam field comments now mapped from Swagger param description when building query schema.
 - FormData generation now guards against undefined body and preserves indentation in generated TS.
 - API model `import type` block now emits no trailing comma on the last imported symbol to satisfy strict lint rules.
+- Added optional AST-based required-field strategy: with `--required-by-omitempty --go-source`, when schema.required is missing, generator treats fields as required by default and marks only `json:,omitempty` as optional.
+- AST optional-field strategy now supports duplicate Go struct names across packages by selecting the best schema-field overlap candidate instead of skipping.
+- AST optional-field scan scope is now limited to `schema` and `fiberx` directories to avoid api/biz layer type-name collisions.
+- Added `--go-source-include` (comma-separated, default `schema,fiberx`) and TS interface property order now follows matched Go struct field declaration order.
+- Group output directory names now use lowerCamel normalization (e.g., `sys-api` -> `sysApi`, `dict-items` -> `dictItems`).
+- CLI now enforces `cobra.NoArgs` to prevent silent argument truncation issues (e.g., unquoted `--go-source` paths with spaces).
 - Added verbose logging flag (-v/--verbose) to control runtime log output in CLI.
 - Verbose logging now prints per-operation details (method/path/query/body/return).
 - CLI framework switched to cobra (professional command line package).
