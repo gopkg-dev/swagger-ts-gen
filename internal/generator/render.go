@@ -10,9 +10,13 @@ import (
 
 func renderRootIndexFile() string {
 	return `/**
- * 接口错误信息
+ * 接口统一返回结果
  */
-export interface ApiError {
+export interface ApiResult<T = any> {
+  /** 是否成功 */
+  success: boolean;
+  /** 返回数据 */
+  data?: T;
   /** HTTP 状态码 */
   code: number;
   /** 错误原因 */
@@ -21,18 +25,6 @@ export interface ApiError {
   message: string;
   /** 额外数据 */
   metadata?: Record<string, any>;
-}
-
-/**
- * 接口统一返回结果
- */
-export interface ApiResult<T = any> {
-  /** 是否成功 */
-  success: boolean;
-  /** 返回数据 */
-  data?: T;
-  /** 错误信息 */
-  error?: ApiError;
 }
 
 /**
@@ -204,8 +196,13 @@ func RenderAPIFile(ops []Operation, modelImports []string, usesPageResult bool) 
 	if len(modelImports) > 0 {
 		sort.Strings(modelImports)
 		b.WriteString("import type {\n")
-		for _, name := range modelImports {
-			b.WriteString("  " + name + ",\n")
+		lastIndex := len(modelImports) - 1
+		for idx, name := range modelImports {
+			lineSuffix := ",\n"
+			if idx == lastIndex {
+				lineSuffix = "\n"
+			}
+			b.WriteString("  " + name + lineSuffix)
 		}
 		b.WriteString("} from './model';\n")
 	}

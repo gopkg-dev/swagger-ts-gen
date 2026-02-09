@@ -15,6 +15,7 @@
 - QueryParam naming: use operationId prefix stripping (query*), otherwise fall back to group name for QueryParam to match backend naming (e.g., RolesQueryParam).
 - QueryParam field comments now mapped from Swagger param description when building query schema.
 - FormData generation now guards against undefined body and preserves indentation in generated TS.
+- API model `import type` block now emits no trailing comma on the last imported symbol to satisfy strict lint rules.
 - Added verbose logging flag (-v/--verbose) to control runtime log output in CLI.
 - Verbose logging now prints per-operation details (method/path/query/body/return).
 - CLI framework switched to cobra (professional command line package).
