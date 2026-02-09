@@ -21,6 +21,8 @@
 - AST optional-field scan scope is now limited to `schema` and `fiberx` directories to avoid api/biz layer type-name collisions.
 - Added `--go-source-include` (comma-separated, default `schema,fiberx`) and TS interface property order now follows matched Go struct field declaration order.
 - Group output directory names now use lowerCamel normalization (e.g., `sys-api` -> `sysApi`, `dict-items` -> `dictItems`).
+- Added `--clean-output` (default true) to prune stale generated group directories in output, preventing duplicate old/new group folders after naming-rule changes.
+- Cross-group duplicated model deduplication is now controlled by `--dedupe-cross-group-models` (default off): when enabled, dedupe by content+name signature and re-export via `export type { X } from '../../<group>/model';`.
 - CLI now enforces `cobra.NoArgs` to prevent silent argument truncation issues (e.g., unquoted `--go-source` paths with spaces).
 - Added verbose logging flag (-v/--verbose) to control runtime log output in CLI.
 - Verbose logging now prints per-operation details (method/path/query/body/return).

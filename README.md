@@ -14,6 +14,7 @@
 - 自动处理分页场景（`current + pageSize`）并映射为 `PageResult<T>`
 - 自动处理 `multipart/form-data` / `x-www-form-urlencoded` 请求并构造 `FormData`
 - 自动处理引用类型与内联类型，按分组输出 `model/index.ts`
+- 可选去重跨分组重复模型：开启参数后，重复结构仅在一个分组定义，其它分组通过 `export type` 复用
 
 ## 环境要求
 
@@ -55,6 +56,8 @@ swagger-ts --help
 - `--go-source`：Go 源码目录（用于 AST 可选性推断）
 - `--go-source-include`：AST 扫描目录名（逗号分隔，默认 `schema,fiberx`）
 - `--required-by-omitempty`：对象字段默认必填，仅 `omitempty` 字段输出可选（需配合 `--go-source`）
+- `--clean-output`：生成前清理输出目录中已失效的旧分组目录（默认开启）
+- `--dedupe-cross-group-models`：开启跨分组重复模型去重（默认关闭）
 
 缺少 `--input` 时会以退出码 `2` 退出；其他错误为退出码 `1`。
 

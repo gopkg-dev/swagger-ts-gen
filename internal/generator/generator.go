@@ -11,11 +11,13 @@ import (
 )
 
 type Options struct {
-	OutputDir           string
-	Logf                func(string, ...any)
-	GoSourceDir         string
-	GoSourceIncludeDirs []string
-	RequiredByOmitEmpty bool
+	OutputDir              string
+	Logf                   func(string, ...any)
+	GoSourceDir            string
+	GoSourceIncludeDirs    []string
+	RequiredByOmitEmpty    bool
+	CleanOutput            bool
+	DedupeCrossGroupModels bool
 }
 
 type Report struct {
@@ -25,13 +27,31 @@ type Report struct {
 }
 
 type Generator struct {
-	spec                 *openapi3.T
-	outputDir            string
-	logf                 func(string, ...any)
-	goSourceDir          string
-	goSourceIncludeDirs  []string
-	requiredByOmitEmpty  bool
-	optionalFieldsByType map[string][]GoStructOptionality
+	spec                   *openapi3.T
+	outputDir              string
+	logf                   func(string, ...any)
+	goSourceDir            string
+	goSourceIncludeDirs    []string
+	requiredByOmitEmpty    bool
+	optionalFieldsByType   map[string][]GoStructOptionality
+	cleanOutput            bool
+	dedupeCrossGroupModels bool
+}
+
+type renderedTypeEntry struct {
+	Def     *TypeDef
+	Content string
+	Deps    []string
+}
+
+type groupGenerationContext struct {
+	rawOps         []RawOperation
+	typedOps       []Operation
+	apiImports     []string
+	usesPageResult bool
+	registry       *TypeRegistry
+	typeEntries    map[string]renderedTypeEntry
+	typeOrder      []string
 }
 
 func New(spec *openapi3.T, opts Options) *Generator {
@@ -40,12 +60,14 @@ func New(spec *openapi3.T, opts Options) *Generator {
 		output = "api"
 	}
 	return &Generator{
-		spec:                spec,
-		outputDir:           output,
-		logf:                opts.Logf,
-		goSourceDir:         strings.TrimSpace(opts.GoSourceDir),
-		goSourceIncludeDirs: normalizeGoSourceIncludeDirs(opts.GoSourceIncludeDirs),
-		requiredByOmitEmpty: opts.RequiredByOmitEmpty,
+		spec:                   spec,
+		outputDir:              output,
+		logf:                   opts.Logf,
+		goSourceDir:            strings.TrimSpace(opts.GoSourceDir),
+		goSourceIncludeDirs:    normalizeGoSourceIncludeDirs(opts.GoSourceIncludeDirs),
+		requiredByOmitEmpty:    opts.RequiredByOmitEmpty,
+		cleanOutput:            opts.CleanOutput,
+		dedupeCrossGroupModels: opts.DedupeCrossGroupModels,
 	}
 }
 
@@ -86,17 +108,52 @@ func (g *Generator) Generate() (*Report, error) {
 	if err := os.MkdirAll(g.outputDir, 0o755); err != nil {
 		return nil, fmt.Errorf("create output dir failed: %w", err)
 	}
+	if g.cleanOutput {
+		if err := pruneStaleGroupDirs(g.outputDir, groupNames); err != nil {
+			return nil, err
+		}
+	}
 	if err := os.WriteFile(filepath.Join(g.outputDir, "index.ts"), []byte(renderRootIndexFile()), 0o644); err != nil {
 		return nil, fmt.Errorf("write root index failed: %w", err)
 	}
 
 	report := &Report{}
+	groupContexts := map[string]*groupGenerationContext{}
 
 	for _, groupName := range groupNames {
 		rawOps := groups[groupName]
 		typedOps, apiImports, usesPageResult, registry, err := g.buildGroupOperations(rawOps)
 		if err != nil {
 			return nil, err
+		}
+
+		expandRegistryReferences(registry)
+		typeDefs := registry.Types()
+		typeEntries, typeOrder := renderTypeEntries(typeDefs, registry)
+		groupContexts[groupName] = &groupGenerationContext{
+			rawOps:         rawOps,
+			typedOps:       typedOps,
+			apiImports:     apiImports,
+			usesPageResult: usesPageResult,
+			registry:       registry,
+			typeEntries:    typeEntries,
+			typeOrder:      typeOrder,
+		}
+		report.Types += len(typeDefs)
+
+		report.Groups++
+		report.Operations += len(rawOps)
+	}
+
+	modelRedirectsByGroup := map[string]map[string]string{}
+	if g.dedupeCrossGroupModels {
+		modelRedirectsByGroup = buildModelRedirectPlan(groupNames, groupContexts)
+	}
+
+	for _, groupName := range groupNames {
+		context := groupContexts[groupName]
+		if context == nil {
+			continue
 		}
 
 		groupDir := filepath.Join(g.outputDir, groupName)
@@ -106,18 +163,14 @@ func (g *Generator) Generate() (*Report, error) {
 			return nil, fmt.Errorf("create model dir failed: %w", err)
 		}
 
-		expandRegistryReferences(registry)
-		typeDefs := registry.Types()
-		report.Types += len(typeDefs)
-
-		bundleContent, bundleLines := renderModelBundle(typeDefs, registry)
-		if bundleLines > 0 {
-			if err := os.WriteFile(filepath.Join(modelDir, "index.ts"), []byte(bundleContent), 0o644); err != nil {
+		modelContent, modelLines := renderGroupModelBundle(groupName, context, modelRedirectsByGroup[groupName])
+		if modelLines > 0 {
+			if err := os.WriteFile(filepath.Join(modelDir, "index.ts"), []byte(modelContent), 0o644); err != nil {
 				return nil, fmt.Errorf("write model bundle failed: %w", err)
 			}
 		}
 
-		apiFiles := SplitAndRenderAPI(typedOps, apiImports, usesPageResult)
+		apiFiles := SplitAndRenderAPI(context.typedOps, context.apiImports, context.usesPageResult)
 		for idx, content := range apiFiles {
 			name := "index.ts"
 			if len(apiFiles) > 1 {
@@ -134,9 +187,6 @@ func (g *Generator) Generate() (*Report, error) {
 				return nil, fmt.Errorf("write api index failed: %w", err)
 			}
 		}
-
-		report.Groups++
-		report.Operations += len(rawOps)
 	}
 
 	return report, nil
@@ -164,6 +214,234 @@ func normalizeGoSourceIncludeDirs(includeDirs []string) []string {
 		return defaultIncludeDirs
 	}
 	return normalized
+}
+
+func renderTypeEntries(defs []*TypeDef, registry *TypeRegistry) (map[string]renderedTypeEntry, []string) {
+	entries := make(map[string]renderedTypeEntry, len(defs))
+	order := make([]string, 0, len(defs))
+	for _, def := range defs {
+		if def == nil || def.Name == "" {
+			continue
+		}
+		content, deps := RenderType(def, registry)
+		if content == "" {
+			continue
+		}
+		entries[def.Name] = renderedTypeEntry{
+			Def:     def,
+			Content: content,
+			Deps:    deps,
+		}
+		order = append(order, def.Name)
+	}
+	return entries, order
+}
+
+func buildModelRedirectPlan(groupNames []string, contexts map[string]*groupGenerationContext) map[string]map[string]string {
+	signatureToGroups := map[string][]string{}
+	signatureToTypeName := map[string]string{}
+
+	for _, groupName := range groupNames {
+		context := contexts[groupName]
+		if context == nil {
+			continue
+		}
+		for typeName, entry := range context.typeEntries {
+			signature := typeName + "\x1f" + entry.Content
+			signatureToGroups[signature] = append(signatureToGroups[signature], groupName)
+			signatureToTypeName[signature] = typeName
+		}
+	}
+
+	redirectsByGroup := map[string]map[string]string{}
+	for signature, groups := range signatureToGroups {
+		if len(groups) < 2 {
+			continue
+		}
+		sortedGroups := uniqueStrings(groups)
+		if len(sortedGroups) < 2 {
+			continue
+		}
+		canonicalGroup := sortedGroups[0]
+		typeName := signatureToTypeName[signature]
+		for _, groupName := range sortedGroups[1:] {
+			if redirectsByGroup[groupName] == nil {
+				redirectsByGroup[groupName] = map[string]string{}
+			}
+			redirectsByGroup[groupName][typeName] = canonicalGroup
+		}
+	}
+
+	return redirectsByGroup
+}
+
+func renderGroupModelBundle(groupName string, context *groupGenerationContext, redirects map[string]string) (string, int) {
+	if context == nil {
+		return "", 0
+	}
+	if len(context.typeOrder) == 0 {
+		return "", 0
+	}
+	if redirects == nil {
+		redirects = map[string]string{}
+	}
+
+	localDefs := make([]*TypeDef, 0, len(context.typeOrder))
+	localTypeEntryByName := map[string]renderedTypeEntry{}
+	for _, typeName := range context.typeOrder {
+		if _, redirected := redirects[typeName]; redirected {
+			continue
+		}
+		entry, exists := context.typeEntries[typeName]
+		if !exists || entry.Def == nil {
+			continue
+		}
+		localDefs = append(localDefs, entry.Def)
+		localTypeEntryByName[typeName] = entry
+	}
+
+	neededRedirectImports := map[string]map[string]struct{}{}
+	for _, entry := range localTypeEntryByName {
+		for _, dep := range entry.Deps {
+			sourceGroup, redirected := redirects[dep]
+			if !redirected {
+				continue
+			}
+			if sourceGroup == "" || sourceGroup == groupName {
+				continue
+			}
+			if neededRedirectImports[sourceGroup] == nil {
+				neededRedirectImports[sourceGroup] = map[string]struct{}{}
+			}
+			neededRedirectImports[sourceGroup][dep] = struct{}{}
+		}
+	}
+
+	redirectedExports := map[string]map[string]struct{}{}
+	for typeName, sourceGroup := range redirects {
+		if sourceGroup == "" || sourceGroup == groupName {
+			continue
+		}
+		if redirectedExports[sourceGroup] == nil {
+			redirectedExports[sourceGroup] = map[string]struct{}{}
+		}
+		redirectedExports[sourceGroup][typeName] = struct{}{}
+	}
+
+	localModelContent, localModelLines := renderModelDefinitions(localDefs, context.registry)
+	includePageParamImport := needsPageParamImport(localDefs)
+	if !includePageParamImport && len(neededRedirectImports) == 0 && len(redirectedExports) == 0 {
+		if localModelLines == 0 {
+			return "", 0
+		}
+		return localModelContent, localModelLines
+	}
+
+	var b strings.Builder
+	if includePageParamImport {
+		b.WriteString("import type { PageParam } from '@/api';\n")
+	}
+
+	importSources := make([]string, 0, len(neededRedirectImports))
+	for sourceGroup := range neededRedirectImports {
+		importSources = append(importSources, sourceGroup)
+	}
+	sort.Strings(importSources)
+	for _, sourceGroup := range importSources {
+		importedNames := mapKeysSorted(neededRedirectImports[sourceGroup])
+		if len(importedNames) == 0 {
+			continue
+		}
+		b.WriteString("import type { " + strings.Join(importedNames, ", ") + " } from '../../" + sourceGroup + "/model';\n")
+	}
+
+	exportSources := make([]string, 0, len(redirectedExports))
+	for sourceGroup := range redirectedExports {
+		exportSources = append(exportSources, sourceGroup)
+	}
+	sort.Strings(exportSources)
+	if len(exportSources) > 0 && b.Len() > 0 {
+		b.WriteString("\n")
+	}
+	for _, sourceGroup := range exportSources {
+		exportedNames := mapKeysSorted(redirectedExports[sourceGroup])
+		if len(exportedNames) == 0 {
+			continue
+		}
+		b.WriteString("export type { " + strings.Join(exportedNames, ", ") + " } from '../../" + sourceGroup + "/model';\n")
+	}
+
+	if localModelLines > 0 {
+		if b.Len() > 0 {
+			b.WriteString("\n")
+		}
+		b.WriteString(localModelContent)
+	}
+
+	finalContent := b.String()
+	if finalContent == "" {
+		return "", 0
+	}
+	return finalContent, countLines(finalContent)
+}
+
+func mapKeysSorted(values map[string]struct{}) []string {
+	if len(values) == 0 {
+		return nil
+	}
+	keys := make([]string, 0, len(values))
+	for key := range values {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
+func pruneStaleGroupDirs(outputDir string, groupNames []string) error {
+	entries, err := os.ReadDir(outputDir)
+	if err != nil {
+		return fmt.Errorf("read output dir failed: %w", err)
+	}
+
+	activeGroups := make(map[string]struct{}, len(groupNames))
+	for _, groupName := range groupNames {
+		activeGroups[groupName] = struct{}{}
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		name := entry.Name()
+		if _, isActive := activeGroups[name]; isActive {
+			continue
+		}
+
+		groupDirPath := filepath.Join(outputDir, name)
+		if !looksLikeGeneratedGroupDir(groupDirPath) {
+			continue
+		}
+		if err := os.RemoveAll(groupDirPath); err != nil {
+			return fmt.Errorf("remove stale group dir %s failed: %w", groupDirPath, err)
+		}
+	}
+
+	return nil
+}
+
+func looksLikeGeneratedGroupDir(groupDirPath string) bool {
+	if groupDirPath == "" {
+		return false
+	}
+	info, err := os.Stat(filepath.Join(groupDirPath, "index.ts"))
+	if err == nil && !info.IsDir() {
+		return true
+	}
+	modelInfo, modelErr := os.Stat(filepath.Join(groupDirPath, "model", "index.ts"))
+	if modelErr == nil && !modelInfo.IsDir() {
+		return true
+	}
+	return false
 }
 
 func renderTypeFile(content string, deps []string) string {
@@ -789,11 +1067,25 @@ func renderModelBundle(defs []*TypeDef, registry *TypeRegistry) (string, int) {
 		return "", 0
 	}
 	var b strings.Builder
-	lineCount := 0
 	if needsPageParamImport(defs) {
 		b.WriteString("import type { PageParam } from '@/api';\n\n")
-		lineCount += 2
 	}
+	modelDefinitions, _ := renderModelDefinitions(defs, registry)
+	if modelDefinitions != "" {
+		b.WriteString(modelDefinitions)
+	}
+	content := b.String()
+	if content == "" {
+		return "", 0
+	}
+	return content, countLines(content)
+}
+
+func renderModelDefinitions(defs []*TypeDef, registry *TypeRegistry) (string, int) {
+	if len(defs) == 0 {
+		return "", 0
+	}
+	var b strings.Builder
 	for idx, def := range defs {
 		content, _ := RenderType(def, registry)
 		if content == "" {
@@ -801,12 +1093,14 @@ func renderModelBundle(defs []*TypeDef, registry *TypeRegistry) (string, int) {
 		}
 		if idx > 0 {
 			b.WriteString("\n")
-			lineCount++
 		}
 		b.WriteString(content)
-		lineCount += countLines(content)
 	}
-	return b.String(), lineCount
+	modelContent := b.String()
+	if modelContent == "" {
+		return "", 0
+	}
+	return modelContent, countLines(modelContent)
 }
 
 func expandRegistryReferences(registry *TypeRegistry) {

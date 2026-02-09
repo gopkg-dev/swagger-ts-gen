@@ -20,6 +20,8 @@ func main() {
 	var goSourceDir string
 	var goSourceInclude string
 	var requiredByOmitEmpty bool
+	var cleanOutput bool
+	var dedupeCrossGroupModels bool
 	var logf func(string, ...any)
 
 	errMissingInput := errors.New("input is required: use -i or --input")
@@ -55,11 +57,13 @@ func main() {
 			}
 
 			gen := generator.New(spec, generator.Options{
-				OutputDir:           output,
-				Logf:                logf,
-				GoSourceDir:         goSourceDir,
-				GoSourceIncludeDirs: parseCommaSeparatedValues(goSourceInclude),
-				RequiredByOmitEmpty: requiredByOmitEmpty,
+				OutputDir:              output,
+				Logf:                   logf,
+				GoSourceDir:            goSourceDir,
+				GoSourceIncludeDirs:    parseCommaSeparatedValues(goSourceInclude),
+				RequiredByOmitEmpty:    requiredByOmitEmpty,
+				CleanOutput:            cleanOutput,
+				DedupeCrossGroupModels: dedupeCrossGroupModels,
 			})
 			if logf != nil {
 				logf("generating output to %s", output)
@@ -85,6 +89,8 @@ func main() {
 	rootCmd.Flags().StringVar(&goSourceDir, "go-source", "", "go source directory for AST optionality inference")
 	rootCmd.Flags().StringVar(&goSourceInclude, "go-source-include", "schema,fiberx", "comma-separated go source subdirectories to scan for AST optionality inference")
 	rootCmd.Flags().BoolVar(&requiredByOmitEmpty, "required-by-omitempty", false, "default object fields to required, only omitempty fields are optional (requires --go-source)")
+	rootCmd.Flags().BoolVar(&cleanOutput, "clean-output", true, "remove stale generated group directories in output path before generation")
+	rootCmd.Flags().BoolVar(&dedupeCrossGroupModels, "dedupe-cross-group-models", false, "deduplicate repeated models across groups by re-exporting from a canonical group")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
